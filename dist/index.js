@@ -62,7 +62,9 @@ const main = async () => {
             const { id: pageId } = issue;
             const page = await (0, client_1.getPage)(notion, pageId);
             console.log({ page });
-            const prop = page.properties["Git commits"];
+            const prop = page.properties["Commits"];
+            if (!prop)
+                return;
             const porpBody = {
                 commits: {
                     rich_text: [
@@ -93,7 +95,9 @@ const main = async () => {
             return;
         const { id: pageId } = issue;
         const page = await (0, client_1.getPage)(notion, pageId);
-        const prop = page.properties["Git PRs"];
+        const prop = page.properties["Pull Requests"];
+        if (!prop)
+            return;
         const title = `${pull_request.state === "closed" ? "✅ " : ""}#${pull_request.number}`;
         const porpBody = {
             prs: {
