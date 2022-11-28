@@ -37,7 +37,6 @@ const client_1 = __nccwpck_require__(1103);
 const token = core.getInput("GITHUB_TOKEN");
 const notionApiKey = core.getInput("NOTION_SECRET");
 const notionDatabase = core.getInput("NOTION_DATABASE");
-console.log({ token, notionApiKey, notionDatabase });
 const main = async () => {
     if (!token)
         throw new Error("Github token not found");
@@ -61,7 +60,6 @@ const main = async () => {
                 return;
             const { id: pageId } = issue;
             const page = await (0, client_1.getPage)(notion, pageId);
-            console.log({ page });
             const prop = page.properties["Commits"];
             if (!prop)
                 return;
@@ -177,12 +175,13 @@ const getPage = async (notion, page_id) => {
 };
 exports.getPage = getPage;
 const updatePageProps = async (notion, page_id, props) => {
+    console.log({ props });
     return await notion.pages.update({
         page_id,
         properties: {
-            ...(props.branches ? { "Git branches": props.branches } : {}),
-            ...(props.commits ? { "Git commits": props.commits } : {}),
-            ...(props.prs ? { "Git PRs": props.prs } : {}),
+            ...(props.branches ? { branches: props.branches } : {}),
+            ...(props.commits ? { Commits: props.commits } : {}),
+            ...(props.prs ? { PRs: props.prs } : {}),
         },
     });
 };
