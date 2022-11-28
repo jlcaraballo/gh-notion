@@ -1,6 +1,28 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 4348:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getPageByCode = void 0;
+const client_1 = __nccwpck_require__(1103);
+const getPageByCode = async (notion, notionDatabase, code) => {
+    const { results } = await (0, client_1.getIssue)(notion, notionDatabase, code.replace("#", ""));
+    const [issue] = results;
+    if (!issue)
+        return;
+    const { id: pageId } = issue;
+    const page = await (0, client_1.getPage)(notion, pageId);
+    return page;
+};
+exports.getPageByCode = getPageByCode;
+//# sourceMappingURL=getPageByCode.js.map
+
+/***/ }),
+
 /***/ 1667:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -33,6 +55,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.main = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
+const getPageByCode_1 = __nccwpck_require__(4348);
 const client_1 = __nccwpck_require__(1103);
 const token = core.getInput("GITHUB_TOKEN");
 const notionApiKey = core.getInput("NOTION_SECRET");
@@ -50,15 +73,13 @@ const main = async () => {
     if (eventType === "push") {
         const push = github.context.payload;
         push.commits.forEach(async (commit) => {
-            const code = commit.message.match(/#\w*/);
-            if (!code || !code[0])
+            const matchs = commit.message.match(/#\w*/);
+            const code = matchs && matchs[0];
+            if (!code)
                 return;
-            const { results } = await (0, client_1.getIssue)(notion, notionDatabase, code[0].replace("#", ""));
-            const [issue] = results;
-            if (!issue)
+            const page = await (0, getPageByCode_1.getPageByCode)(notion, notionDatabase, code);
+            if (!page)
                 return;
-            const { id: pageId } = issue;
-            const page = await (0, client_1.getPage)(notion, pageId);
             const prop = page.properties["Commits"];
             if (!prop)
                 return;
@@ -78,25 +99,23 @@ const main = async () => {
                     ],
                 },
             };
-            await (0, client_1.updatePageProps)(notion, pageId, porpBody);
+            await (0, client_1.updatePageProps)(notion, page.id, porpBody);
         });
     }
     if (eventType === "pull_request") {
         const { pull_request } = github.context.payload;
-        const code = pull_request.title.match(/#\w*/);
-        if (!code || !code[0])
+        const matchs = pull_request.title.match(/#\w*/);
+        const code = matchs && matchs[0];
+        if (!code)
             return;
-        const { results } = await (0, client_1.getIssue)(notion, notionDatabase, code[0].replace("#", ""));
-        const [issue] = results;
-        if (!issue)
+        const page = await (0, getPageByCode_1.getPageByCode)(notion, notionDatabase, code);
+        if (!page)
             return;
-        const { id: pageId } = issue;
-        const page = await (0, client_1.getPage)(notion, pageId);
         const prop = page.properties["Pull Requests"];
-        if (!prop)
+        if (!prop || !prop.rich_text)
             return;
         const title = `${pull_request.state === "closed" ? "✅ " : ""}#${pull_request.number}`;
-        const oldsPR = prop.rich_text.filter((item) => item.text.url !== pull_request.url);
+        const oldsPR = prop.rich_text.filter((item) => item.text?.link?.url !== pull_request.url);
         const porpBody = {
             prs: {
                 rich_text: [
@@ -104,7 +123,7 @@ const main = async () => {
                     {
                         type: "text",
                         text: {
-                            content: prop.rich_text?.length ? `, ${title}` : `${title}`,
+                            content: oldsPR?.length ? `, ${title}` : `${title}`,
                             link: {
                                 url: pull_request.url,
                             },
@@ -113,13 +132,42 @@ const main = async () => {
                 ],
             },
         };
-        await (0, client_1.updatePageProps)(notion, pageId, porpBody);
-        // Add comment to pull request
+        await (0, client_1.updatePageProps)(notion, page.id, porpBody);
         await octokit.rest.issues.createComment({
             ...github.context.repo,
             issue_number: pull_request.number,
             body: `Notion task: ${page.url}`,
         });
+    }
+    if (eventType === "create") {
+        const { ref } = github.context.payload;
+        const branchName = ref.split("/").at(-1) || "";
+        const matchs = branchName.match(/#\w*/);
+        const code = matchs && matchs[0];
+        if (!code)
+            return;
+        const page = await (0, getPageByCode_1.getPageByCode)(notion, notionDatabase, code);
+        if (!page)
+            return;
+        const prop = page.properties["Branch"];
+        if (!prop || !prop.rich_text)
+            return;
+        const porpBody = {
+            branches: {
+                rich_text: [
+                    ...prop.rich_text,
+                    {
+                        type: "text",
+                        text: {
+                            content: prop.rich_text?.length
+                                ? `, ${branchName}`
+                                : `${branchName}`,
+                        },
+                    },
+                ],
+            },
+        };
+        await (0, client_1.updatePageProps)(notion, page.id, porpBody);
     }
 };
 exports.main = main;
