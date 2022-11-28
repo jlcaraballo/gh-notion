@@ -29,7 +29,6 @@ export const main = async () => {
 
   if (eventType === "push") {
     const push = github.context.payload as PushEvent;
-    console.log({ push });
     push.commits.forEach(async (commit) => {
       const code = commit.message.match(/#\w*/);
       if (!code || !code[0]) return;

@@ -38,7 +38,6 @@ export const updatePageProps = async (
   page_id: string,
   props: PageProperty
 ) => {
-  console.log({ props });
   return await notion.pages.update({
     page_id,
     properties: {
