@@ -1,0 +1,24 @@
+{
+  "name": "gh-notion",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "repository": "git@github.com:jlcaraballo/gh-notion.git",
+  "author": "Jorge Caraballo <jorgelcs85@gmail.com>",
+  "license": "MIT",
+  "keywords": [
+    "Notion",
+    "productivity"
+  ],
+  "dependencies": {
+    "@actions/core": "^1.10.0",
+    "@actions/github": "^5.1.1",
+    "@notionhq/client": "^2.2.2",
+    "@octokit/webhooks-definitions": "^3.67.3",
+    "actions-toolkit": "^6.0.1",
+    "axios": "^1.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "16.11.7",
+    "typescript": "^4.9.3"
+  }
+}

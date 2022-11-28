@@ -1,0 +1,16 @@
+name: "GH notion"
+description: "Sync your commits and pull requests to Notion"
+inputs:
+  GITHUB_TOKEN:
+    description: "GitHub token"
+    required: true
+  NOTION_SECRET:
+    description: "Notion Secret"
+    required: true
+  NOTION_DATABASE:
+    description: "Notion Database ID"
+    required: true
+
+runs:
+  using: "node16"
+  main: "index.js"
