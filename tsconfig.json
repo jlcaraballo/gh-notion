@@ -11,8 +11,8 @@
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "declarationDir": "./build",
-    "outDir": "./build",
+    "declarationDir": "./dist",
+    "outDir": "./dist",
     "typeRoots": ["node_modules/@types", "@types"]
   },
   "include": ["src", "tooling"],
