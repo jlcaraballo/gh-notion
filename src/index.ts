@@ -1,16 +1,13 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 import {
+  CreateEvent,
   PullRequestEvent,
   PushEvent,
 } from "@octokit/webhooks-definitions/schema";
+import { getPageByCode } from "./getPageByCode";
 
-import {
-  getIssue,
-  getPage,
-  instance,
-  updatePageProps,
-} from "./services/client";
+import { instance, updatePageProps } from "./services/client";
 
 const token = core.getInput("GITHUB_TOKEN");
 const notionApiKey = core.getInput("NOTION_SECRET");
@@ -30,20 +27,12 @@ export const main = async () => {
   if (eventType === "push") {
     const push = github.context.payload as PushEvent;
     push.commits.forEach(async (commit) => {
-      const code = commit.message.match(/#\w*/);
-      if (!code || !code[0]) return;
+      const matchs = commit.message.match(/#\w*/);
+      const code = matchs && matchs[0];
+      if (!code) return;
 
-      const { results } = await getIssue(
-        notion,
-        notionDatabase,
-        code[0].replace("#", "")
-      );
-
-      const [issue] = results;
-      if (!issue) return;
-
-      const { id: pageId } = issue;
-      const page = await getPage(notion, pageId);
+      const page = await getPageByCode(notion, notionDatabase, code);
+      if (!page) return;
 
       const prop = page.properties["Commits"];
 
@@ -65,37 +54,30 @@ export const main = async () => {
           ],
         },
       };
-      await updatePageProps(notion, pageId, porpBody);
+      await updatePageProps(notion, page.id, porpBody);
     });
   }
 
   if (eventType === "pull_request") {
     const { pull_request } = github.context.payload as PullRequestEvent;
 
-    const code = pull_request.title.match(/#\w*/);
-    if (!code || !code[0]) return;
+    const matchs = pull_request.title.match(/#\w*/);
+    const code = matchs && matchs[0];
+    if (!code) return;
 
-    const { results } = await getIssue(
-      notion,
-      notionDatabase,
-      code[0].replace("#", "")
-    );
+    const page = await getPageByCode(notion, notionDatabase, code);
+    if (!page) return;
 
-    const [issue] = results;
-    if (!issue) return;
-
-    const { id: pageId } = issue;
-    const page = await getPage(notion, pageId);
     const prop = page.properties["Pull Requests"];
 
-    if (!prop) return;
+    if (!prop || !prop.rich_text) return;
 
     const title = `${pull_request.state === "closed" ? "✅ " : ""}#${
       pull_request.number
     }`;
 
     const oldsPR = prop.rich_text.filter(
-      (item: any) => item.text.url !== pull_request.url
+      (item: any) => item.text?.link?.url !== pull_request.url
     );
 
     const porpBody = {
@@ -105,7 +87,7 @@ export const main = async () => {
           {
             type: "text",
             text: {
-              content: prop.rich_text?.length ? `, ${title}` : `${title}`,
+              content: oldsPR?.length ? `, ${title}` : `${title}`,
               link: {
                 url: pull_request.url,
               },
@@ -114,14 +96,46 @@ export const main = async () => {
         ],
       },
     };
-    await updatePageProps(notion, pageId, porpBody);
+    await updatePageProps(notion, page.id, porpBody);
 
-    // Add comment to pull request
     await octokit.rest.issues.createComment({
       ...github.context.repo,
       issue_number: pull_request.number,
       body: `Notion task: ${page.url}`,
     });
+  }
+
+  if (eventType === "create") {
+    const { ref } = github.context.payload as CreateEvent;
+    const branchName = ref.split("/").at(-1) || "";
+
+    const matchs = branchName.match(/#\w*/);
+    const code = matchs && matchs[0];
+    if (!code) return;
+
+    const page = await getPageByCode(notion, notionDatabase, code);
+    if (!page) return;
+
+    const prop = page.properties["Branch"];
+
+    if (!prop || !prop.rich_text) return;
+
+    const porpBody = {
+      branches: {
+        rich_text: [
+          ...prop.rich_text,
+          {
+            type: "text",
+            text: {
+              content: prop.rich_text?.length
+                ? `, ${branchName}`
+                : `${branchName}`,
+            },
+          },
+        ],
+      },
+    };
+    await updatePageProps(notion, page.id, porpBody);
   }
 };
 
