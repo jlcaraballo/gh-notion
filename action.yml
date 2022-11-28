@@ -14,3 +14,7 @@ inputs:
 runs:
   using: "node16"
   main: "index.js"
+
+branding:
+  icon: "git-pull-request"
+  color: "purple"
