@@ -1,6 +1,162 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 8541:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createBrachevent = void 0;
+const getPageByCode_1 = __nccwpck_require__(4348);
+const client_1 = __nccwpck_require__(1103);
+const createBrachevent = async (notion, notionDatabase, branchName) => {
+    const matchs = branchName.match(/#\w*/);
+    const code = matchs && matchs[0];
+    if (!code)
+        return;
+    const page = await (0, getPageByCode_1.getPageByCode)(notion, notionDatabase, code);
+    if (!page)
+        return;
+    const propBranch = page.properties["Branch"];
+    const propsBody = {
+        branches: {
+            rich_text: [
+                ...propBranch.rich_text,
+                {
+                    type: "text",
+                    text: {
+                        content: propBranch.rich_text?.length
+                            ? `, ${branchName}`
+                            : `${branchName}`,
+                    },
+                },
+            ],
+        },
+    };
+    await (0, client_1.updatePageProps)(notion, page.id, propsBody);
+};
+exports.createBrachevent = createBrachevent;
+//# sourceMappingURL=createBrachEvent.js.map
+
+/***/ }),
+
+/***/ 3638:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createCommitEvent = void 0;
+const getPageByCode_1 = __nccwpck_require__(4348);
+const client_1 = __nccwpck_require__(1103);
+const createCommitEvent = async (notion, notionDatabase, commit) => {
+    const matchs = commit.message.match(/#\w*/);
+    const code = matchs && matchs[0];
+    if (!code)
+        return;
+    const page = await (0, getPageByCode_1.getPageByCode)(notion, notionDatabase, code);
+    if (!page)
+        return;
+    const propCommits = page.properties["Commits"];
+    const porpBody = {
+        commits: {
+            rich_text: [
+                ...propCommits.rich_text,
+                {
+                    type: "text",
+                    text: {
+                        content: `${commit.message}\n`,
+                        link: {
+                            url: commit.url,
+                        },
+                    },
+                },
+            ],
+        },
+    };
+    await (0, client_1.updatePageProps)(notion, page.id, porpBody);
+};
+exports.createCommitEvent = createCommitEvent;
+//# sourceMappingURL=createCommitEvent.js.map
+
+/***/ }),
+
+/***/ 9236:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createPullRequestEvent = void 0;
+const github = __importStar(__nccwpck_require__(5438));
+const getPageByCode_1 = __nccwpck_require__(4348);
+const client_1 = __nccwpck_require__(1103);
+const createPullRequestEvent = async (notion, notionDatabase, token_github, pull_request) => {
+    const octokit = github.getOctokit(token_github);
+    const matchs = pull_request.title.match(/#\w*/);
+    const code = matchs && matchs[0];
+    if (!code)
+        return;
+    const page = await (0, getPageByCode_1.getPageByCode)(notion, notionDatabase, code);
+    if (!page)
+        return;
+    const prop = page.properties["Pull Requests"];
+    if (!prop || !prop.rich_text)
+        return;
+    const title = `${pull_request.state === "closed" ? "✅ " : ""}#${pull_request.number}`;
+    const oldsPR = prop.rich_text.filter((item) => item.text?.link?.url !== pull_request.html_url);
+    const porpBody = {
+        prs: {
+            rich_text: [
+                ...oldsPR,
+                {
+                    type: "text",
+                    text: {
+                        content: oldsPR?.length ? `, ${title}` : `${title}`,
+                        link: {
+                            url: pull_request.html_url,
+                        },
+                    },
+                },
+            ],
+        },
+    };
+    await (0, client_1.updatePageProps)(notion, page.id, porpBody);
+    await octokit.rest.issues.createComment({
+        ...github.context.repo,
+        issue_number: pull_request.number,
+        body: `Notion task: ${page.url}`,
+    });
+};
+exports.createPullRequestEvent = createPullRequestEvent;
+//# sourceMappingURL=createPullRequestEvent.js.map
+
+/***/ }),
+
 /***/ 4348:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
@@ -55,7 +211,9 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.main = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
-const getPageByCode_1 = __nccwpck_require__(4348);
+const createBrachEvent_1 = __nccwpck_require__(8541);
+const createCommitEvent_1 = __nccwpck_require__(3638);
+const createPullRequestEvent_1 = __nccwpck_require__(9236);
 const client_1 = __nccwpck_require__(1103);
 const token = core.getInput("GITHUB_TOKEN");
 const notionApiKey = core.getInput("NOTION_SECRET");
@@ -68,106 +226,16 @@ const main = async () => {
     if (!notionDatabase)
         throw new Error("Notion DATABASE ID not found");
     const notion = (0, client_1.instance)(notionApiKey);
-    const octokit = github.getOctokit(token);
     const eventType = github.context.eventName;
     if (eventType === "push") {
         const push = github.context.payload;
-        push.commits.forEach(async (commit) => {
-            const matchs = commit.message.match(/#\w*/);
-            const code = matchs && matchs[0];
-            if (!code)
-                return;
-            const page = await (0, getPageByCode_1.getPageByCode)(notion, notionDatabase, code);
-            if (!page)
-                return;
-            const prop = page.properties["Commits"];
-            if (!prop)
-                return;
-            const porpBody = {
-                commits: {
-                    rich_text: [
-                        ...prop.rich_text,
-                        {
-                            type: "text",
-                            text: {
-                                content: `${commit.message}\n`,
-                                link: {
-                                    url: commit.url,
-                                },
-                            },
-                        },
-                    ],
-                },
-            };
-            await (0, client_1.updatePageProps)(notion, page.id, porpBody);
-        });
+        const branchName = push.ref.split("/").at(-1) || "";
+        await (0, createBrachEvent_1.createBrachevent)(notion, notionDatabase, branchName);
+        push.commits.forEach(async (commit) => await (0, createCommitEvent_1.createCommitEvent)(notion, notionDatabase, commit));
     }
     if (eventType === "pull_request") {
         const { pull_request } = github.context.payload;
-        const matchs = pull_request.title.match(/#\w*/);
-        const code = matchs && matchs[0];
-        if (!code)
-            return;
-        const page = await (0, getPageByCode_1.getPageByCode)(notion, notionDatabase, code);
-        if (!page)
-            return;
-        const prop = page.properties["Pull Requests"];
-        if (!prop || !prop.rich_text)
-            return;
-        const title = `${pull_request.state === "closed" ? "✅ " : ""}#${pull_request.number}`;
-        const oldsPR = prop.rich_text.filter((item) => item.text?.link?.url !== pull_request.html_url);
-        const porpBody = {
-            prs: {
-                rich_text: [
-                    ...oldsPR,
-                    {
-                        type: "text",
-                        text: {
-                            content: oldsPR?.length ? `, ${title}` : `${title}`,
-                            link: {
-                                url: pull_request.html_url,
-                            },
-                        },
-                    },
-                ],
-            },
-        };
-        await (0, client_1.updatePageProps)(notion, page.id, porpBody);
-        await octokit.rest.issues.createComment({
-            ...github.context.repo,
-            issue_number: pull_request.number,
-            body: `Notion task: ${page.url}`,
-        });
-    }
-    if (eventType === "create") {
-        const { ref } = github.context.payload;
-        const branchName = ref.split("/").at(-1) || "";
-        const matchs = branchName.match(/#\w*/);
-        const code = matchs && matchs[0];
-        if (!code)
-            return;
-        const page = await (0, getPageByCode_1.getPageByCode)(notion, notionDatabase, code);
-        if (!page)
-            return;
-        const prop = page.properties["Branch"];
-        if (!prop || !prop.rich_text)
-            return;
-        const porpBody = {
-            branches: {
-                rich_text: [
-                    ...prop.rich_text,
-                    {
-                        type: "text",
-                        text: {
-                            content: prop.rich_text?.length
-                                ? `, ${branchName}`
-                                : `${branchName}`,
-                        },
-                    },
-                ],
-            },
-        };
-        await (0, client_1.updatePageProps)(notion, page.id, porpBody);
+        await (0, createPullRequestEvent_1.createPullRequestEvent)(notion, notionDatabase, token, pull_request);
     }
 };
 exports.main = main;
