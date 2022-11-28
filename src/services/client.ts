@@ -52,9 +52,9 @@ export const updatePageProps = async (
   return await notion.pages.update({
     page_id,
     properties: {
-      ...(props.branches ? { "Git branches": props.branches } : {}),
-      ...(props.commits ? { "Git commits": props.commits } : {}),
-      ...(props.prs ? { "Git PRs": props.prs } : {}),
+      ...(props.branches ? { branches: props.branches } : {}),
+      ...(props.commits ? { Commits: props.commits } : {}),
+      ...(props.prs ? { PRs: props.prs } : {}),
     },
   });
 };
