@@ -16,6 +16,8 @@ const token = core.getInput("GITHUB_TOKEN");
 const notionApiKey = core.getInput("NOTION_SECRET");
 const notionDatabase = core.getInput("NOTION_DATABASE");
 
+console.log({ token, notionApiKey, notionDatabase });
+
 export const main = async () => {
   if (!token) throw new Error("Github token not found");
   if (!notionApiKey) throw new Error("Notion secret key nor found");
@@ -29,6 +31,7 @@ export const main = async () => {
 
   if (eventType === "push") {
     const push = github.context.payload as PushEvent;
+    console.log({ push });
     push.commits.forEach(async (commit) => {
       const code = commit.message.match(/#\w*/);
       if (!code || !code[0]) return;
@@ -44,6 +47,9 @@ export const main = async () => {
 
       const { id: pageId } = issue;
       const page = await getPage(notion, pageId);
+
+      console.log({ page });
+
       const prop = page.properties["Git commits"];
       const porpBody = {
         commits: {

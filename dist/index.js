@@ -37,6 +37,7 @@ const client_1 = __nccwpck_require__(1103);
 const token = core.getInput("GITHUB_TOKEN");
 const notionApiKey = core.getInput("NOTION_SECRET");
 const notionDatabase = core.getInput("NOTION_DATABASE");
+console.log({ token, notionApiKey, notionDatabase });
 const main = async () => {
     if (!token)
         throw new Error("Github token not found");
@@ -49,6 +50,7 @@ const main = async () => {
     const eventType = github.context.eventName;
     if (eventType === "push") {
         const push = github.context.payload;
+        console.log({ push });
         push.commits.forEach(async (commit) => {
             const code = commit.message.match(/#\w*/);
             if (!code || !code[0])
@@ -59,6 +61,7 @@ const main = async () => {
                 return;
             const { id: pageId } = issue;
             const page = await (0, client_1.getPage)(notion, pageId);
+            console.log({ page });
             const prop = page.properties["Git commits"];
             const porpBody = {
                 commits: {
