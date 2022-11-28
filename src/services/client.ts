@@ -2,17 +2,6 @@ import { Client } from "@notionhq/client";
 
 export const instance = (token: string) => new Client({ auth: token });
 
-// axios.create({
-//   baseURL: "https://api.notion.com/",
-//   timeout: 15000,
-//   headers: {
-//     Authorization: `Bearer ${token}`,
-//     accept: "application/json",
-//     "Notion-Version": "2022-06-28",
-//     "content-type": "application/json",
-//   },
-// });
-
 export const getIssue = async (
   notion: Client,
   database_id: string,
@@ -55,7 +44,7 @@ export const updatePageProps = async (
     properties: {
       ...(props.branches ? { branches: props.branches } : {}),
       ...(props.commits ? { Commits: props.commits } : {}),
-      ...(props.prs ? { PRs: props.prs } : {}),
+      ...(props.prs ? { "Pull Requests": props.prs } : {}),
     },
   });
 };
