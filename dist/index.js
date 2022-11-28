@@ -115,7 +115,7 @@ const main = async () => {
         if (!prop || !prop.rich_text)
             return;
         const title = `${pull_request.state === "closed" ? "✅ " : ""}#${pull_request.number}`;
-        const oldsPR = prop.rich_text.filter((item) => item.text?.link?.url !== pull_request.url);
+        const oldsPR = prop.rich_text.filter((item) => item.text?.link?.url !== pull_request.html_url);
         const porpBody = {
             prs: {
                 rich_text: [
@@ -125,7 +125,7 @@ const main = async () => {
                         text: {
                             content: oldsPR?.length ? `, ${title}` : `${title}`,
                             link: {
-                                url: pull_request.url,
+                                url: pull_request.html_url,
                             },
                         },
                     },
