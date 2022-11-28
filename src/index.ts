@@ -77,7 +77,7 @@ export const main = async () => {
     }`;
 
     const oldsPR = prop.rich_text.filter(
-      (item: any) => item.text?.link?.url !== pull_request.url
+      (item: any) => item.text?.link?.url !== pull_request.html_url
     );
 
     const porpBody = {
@@ -89,7 +89,7 @@ export const main = async () => {
             text: {
               content: oldsPR?.length ? `, ${title}` : `${title}`,
               link: {
-                url: pull_request.url,
+                url: pull_request.html_url,
               },
             },
           },
