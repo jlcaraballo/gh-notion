@@ -5,7 +5,8 @@ on:
       - main
   pull_request:
     types: [opened, reopened, closed]
-  create
+  create:
+   - **
 
 jobs:
   build:
