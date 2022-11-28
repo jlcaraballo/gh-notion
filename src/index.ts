@@ -114,3 +114,10 @@ export const main = async () => {
     });
   }
 };
+
+main()
+  .then(() => {})
+  .catch((err) => {
+    console.log("ERROR", err);
+    core.setFailed(err.message);
+  });
