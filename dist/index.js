@@ -49,7 +49,6 @@ const main = async () => {
     const eventType = github.context.eventName;
     if (eventType === "push") {
         const push = github.context.payload;
-        console.log({ push });
         push.commits.forEach(async (commit) => {
             const code = commit.message.match(/#\w*/);
             if (!code || !code[0])
@@ -97,10 +96,11 @@ const main = async () => {
         if (!prop)
             return;
         const title = `${pull_request.state === "closed" ? "✅ " : ""}#${pull_request.number}`;
+        const oldsPR = prop.rich_text.filter((item) => item.text.url !== pull_request.url);
         const porpBody = {
             prs: {
                 rich_text: [
-                    ...prop.rich_text,
+                    ...oldsPR,
                     {
                         type: "text",
                         text: {
@@ -143,16 +143,6 @@ exports.updatePageProps = exports.getPage = exports.getIssue = exports.instance 
 const client_1 = __nccwpck_require__(324);
 const instance = (token) => new client_1.Client({ auth: token });
 exports.instance = instance;
-// axios.create({
-//   baseURL: "https://api.notion.com/",
-//   timeout: 15000,
-//   headers: {
-//     Authorization: `Bearer ${token}`,
-//     accept: "application/json",
-//     "Notion-Version": "2022-06-28",
-//     "content-type": "application/json",
-//   },
-// });
 const getIssue = async (notion, database_id, code) => {
     return await notion.databases.query({
         database_id,
@@ -175,13 +165,12 @@ const getPage = async (notion, page_id) => {
 };
 exports.getPage = getPage;
 const updatePageProps = async (notion, page_id, props) => {
-    console.log({ props });
     return await notion.pages.update({
         page_id,
         properties: {
             ...(props.branches ? { branches: props.branches } : {}),
             ...(props.commits ? { Commits: props.commits } : {}),
-            ...(props.prs ? { PRs: props.prs } : {}),
+            ...(props.prs ? { "Pull Requests": props.prs } : {}),
         },
     });
 };
