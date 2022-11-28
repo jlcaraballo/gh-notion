@@ -1,7 +1,8 @@
 name: Commit to Notion
 on:
   push:
-    - main
+    branches:
+      - main
   pull_request:
     types: [opened, reopened, closed]
 
