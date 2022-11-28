@@ -94,10 +94,14 @@ export const main = async () => {
       pull_request.number
     }`;
 
+    const oldsPR = prop.rich_text.filter(
+      (item: any) => item.text.url !== pull_request.url
+    );
+
     const porpBody = {
       prs: {
         rich_text: [
-          ...prop.rich_text,
+          ...oldsPR,
           {
             type: "text",
             text: {
