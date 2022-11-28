@@ -50,7 +50,10 @@ export const main = async () => {
 
       console.log({ page });
 
-      const prop = page.properties["Git commits"];
+      const prop = page.properties["Commits"];
+
+      if (!prop) return;
+
       const porpBody = {
         commits: {
           rich_text: [
@@ -88,7 +91,9 @@ export const main = async () => {
 
     const { id: pageId } = issue;
     const page = await getPage(notion, pageId);
-    const prop = page.properties["Git PRs"];
+    const prop = page.properties["Pull Requests"];
+
+    if (!prop) return;
 
     const title = `${pull_request.state === "closed" ? "✅ " : ""}#${
       pull_request.number
