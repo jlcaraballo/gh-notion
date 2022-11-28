@@ -222,6 +222,11 @@
   dependencies:
     "@types/node" "*"
 
+"@vercel/ncc@^0.34.0":
+  version "0.34.0"
+  resolved "https://registry.yarnpkg.com/@vercel/ncc/-/ncc-0.34.0.tgz#d0139528320e46670d949c82967044a8f66db054"
+  integrity sha512-G9h5ZLBJ/V57Ou9vz5hI8pda/YQX5HQszCs3AmIus3XzsmRn/0Ptic5otD3xVST8QLKk7AMk7AqpsyQGN7MZ9A==
+
 actions-toolkit@^6.0.1:
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/actions-toolkit/-/actions-toolkit-6.0.1.tgz#ef39f8956339cc0e8aea177a36640e1fba4c19c9"
