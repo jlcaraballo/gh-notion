@@ -23,7 +23,7 @@ const createBrachevent = async (notion, notionDatabase, branchName) => {
     const propBranch = page.properties["Branch"];
     if (!propBranch)
         return;
-    const oldBranchs = propBranch.rich_text.filter((item) => !item.text?.content?.include(branchName));
+    const oldBranchs = propBranch.rich_text.filter((item) => !item.text?.content?.includes(branchName));
     const propsBody = {
         Branch: {
             rich_text: [
@@ -31,7 +31,7 @@ const createBrachevent = async (notion, notionDatabase, branchName) => {
                 {
                     type: "text",
                     text: {
-                        content: oldBranchs?.length ? `, ${branchName}` : `${branchName}`,
+                        content: `${branchName}\n`,
                     },
                 },
             ],
@@ -135,7 +135,7 @@ const createPullRequestEvent = async (notion, notionDatabase, token_github, pull
     const prop = page.properties["Pull Requests"];
     if (!prop || !prop.rich_text)
         return;
-    const title = `${pull_request.state === "closed" ? "✅ " : ""}#${pull_request.number}`;
+    const title = `${pull_request.state === "closed" ? "✅ " : ""} #${pull_request.number}: ${pull_request.title}`;
     const oldsPR = prop.rich_text.filter((item) => item.text?.link?.url !== pull_request.html_url);
     const porpBody = {
         "Pull Requests": {
@@ -144,7 +144,7 @@ const createPullRequestEvent = async (notion, notionDatabase, token_github, pull
                 {
                     type: "text",
                     text: {
-                        content: oldsPR?.length ? `, ${title}` : `${title}`,
+                        content: `${title}\n`,
                         link: {
                             url: pull_request.html_url,
                         },

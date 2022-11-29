@@ -23,9 +23,9 @@ export const createPullRequestEvent = async (
 
   if (!prop || !prop.rich_text) return;
 
-  const title = `${pull_request.state === "closed" ? "✅ " : ""}#${
+  const title = `${pull_request.state === "closed" ? "✅ " : ""} #${
     pull_request.number
-  }`;
+  }: ${pull_request.title}`;
 
   const oldsPR = prop.rich_text.filter(
     (item: any) => item.text?.link?.url !== pull_request.html_url
@@ -38,7 +38,7 @@ export const createPullRequestEvent = async (
         {
           type: "text",
           text: {
-            content: oldsPR?.length ? `, ${title}` : `${title}`,
+            content: `${title}\n`,
             link: {
               url: pull_request.html_url,
             },

@@ -21,7 +21,7 @@ export const createBrachevent = async (
   if (!propBranch) return;
 
   const oldBranchs = propBranch.rich_text.filter(
-    (item: any) => !item.text?.content?.include(branchName)
+    (item: any) => !item.text?.content?.includes(branchName)
   );
 
   const propsBody = {
@@ -31,7 +31,7 @@ export const createBrachevent = async (
         {
           type: "text",
           text: {
-            content: oldBranchs?.length ? `, ${branchName}` : `${branchName}`,
+            content: `${branchName}\n`,
           },
         },
       ],
