@@ -26,9 +26,7 @@ export const main = async () => {
 
   if (eventType === "push") {
     const push = github.context.payload as PushEvent;
-    const branchName = push.ref.split("/").at(-1) || "";
-
-    console.log({ push, branchName });
+    const branchName = push.ref.replace("refs/heads/", "");
 
     await createBrachEvent(notion, notionDatabase, branchName);
 

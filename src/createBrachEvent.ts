@@ -11,21 +11,27 @@ export const createBrachevent = async (
   const code = matchs && matchs[0];
   if (!code) return;
 
-  const page = await getPageByCode(notion, notionDatabase, code);
+  const page = await getPageByCode(
+    notion,
+    notionDatabase,
+    code.replace("_", " ")
+  );
   if (!page) return;
 
   const propBranch = page.properties["Branch"];
 
+  const oldBranchs = propBranch.rich_text.filter(
+    (item: any) => !item.text?.content?.include(branchName)
+  );
+
   const propsBody = {
     Branch: {
       rich_text: [
-        ...propBranch.rich_text,
+        ...oldBranchs,
         {
           type: "text",
           text: {
-            content: propBranch.rich_text?.length
-              ? `, ${branchName}`
-              : `${branchName}`,
+            content: oldBranchs?.length ? `, ${branchName}` : `${branchName}`,
           },
         },
       ],
