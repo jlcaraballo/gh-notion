@@ -10,7 +10,7 @@ export const getIssue = async (
   return await notion.databases.query({
     database_id,
     filter: {
-      property: "ISSUE_CODE",
+      property: "Code",
       formula: {
         string: {
           equals: code,
