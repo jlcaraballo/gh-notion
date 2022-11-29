@@ -15,20 +15,19 @@ const createBrachevent = async (notion, notionDatabase, branchName) => {
     const code = matchs && matchs[0];
     if (!code)
         return;
-    const page = await (0, getPageByCode_1.getPageByCode)(notion, notionDatabase, code);
+    const page = await (0, getPageByCode_1.getPageByCode)(notion, notionDatabase, code.replace("_", " "));
     if (!page)
         return;
     const propBranch = page.properties["Branch"];
+    const oldBranchs = propBranch.rich_text.filter((item) => !item.text?.content?.include(branchName));
     const propsBody = {
         Branch: {
             rich_text: [
-                ...propBranch.rich_text,
+                ...oldBranchs,
                 {
                     type: "text",
                     text: {
-                        content: propBranch.rich_text?.length
-                            ? `, ${branchName}`
-                            : `${branchName}`,
+                        content: oldBranchs?.length ? `, ${branchName}` : `${branchName}`,
                     },
                 },
             ],
@@ -229,7 +228,7 @@ const main = async () => {
     const eventType = github.context.eventName;
     if (eventType === "push") {
         const push = github.context.payload;
-        const branchName = push.ref.split("/").at(-1) || "";
+        const branchName = push.ref.replace("refs/heads/", "");
         await (0, createBrachEvent_1.createBrachevent)(notion, notionDatabase, branchName);
         push.commits.forEach(async (commit) => await (0, createCommitEvent_1.createCommitEvent)(notion, notionDatabase, commit));
     }

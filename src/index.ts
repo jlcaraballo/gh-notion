@@ -4,7 +4,8 @@ import {
   PullRequestEvent,
   PushEvent,
 } from "@octokit/webhooks-definitions/schema";
-import { createBrachevent } from "./createBrachEvent";
+
+import { createBrachevent as createBrachEvent } from "./createBrachEvent";
 import { createCommitEvent } from "./createCommitEvent";
 import { createPullRequestEvent } from "./createPullRequestEvent";
 
@@ -25,9 +26,9 @@ export const main = async () => {
 
   if (eventType === "push") {
     const push = github.context.payload as PushEvent;
-    const branchName = push.ref.split("/").at(-1) || "";
+    const branchName = push.ref.replace("refs/heads/", "");
 
-    await createBrachevent(notion, notionDatabase, branchName);
+    await createBrachEvent(notion, notionDatabase, branchName);
 
     push.commits.forEach(
       async (commit) => await createCommitEvent(notion, notionDatabase, commit)
