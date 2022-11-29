@@ -7,21 +7,21 @@ export const createBrachevent = async (
   notionDatabase: string,
   branchName: string
 ) => {
-  const matchs = branchName.match(/#\w*/);
+  const matchs = branchName.replace(/_/g, " ").match(/#\w*/);
   const code = matchs && matchs[0];
+  console.log({ branchName, matchs, code });
   if (!code) return;
 
-  const page = await getPageByCode(
-    notion,
-    notionDatabase,
-    code.replace("_", " ")
-  );
+  const page = await getPageByCode(notion, notionDatabase, code);
+  console.log({ page });
   if (!page) return;
 
   const propBranch = page.properties["Branch"];
 
+  if (!propBranch) return;
+
   const oldBranchs = propBranch.rich_text.filter(
-    (item: any) => !item.text?.content?.include(branchName)
+    (item: any) => !item.text?.content?.includes(branchName)
   );
 
   const propsBody = {
@@ -31,12 +31,15 @@ export const createBrachevent = async (
         {
           type: "text",
           text: {
-            content: oldBranchs?.length ? `, ${branchName}` : `${branchName}`,
+            content: `${branchName}\n`,
           },
         },
       ],
     },
   };
+  console.log({ propsBody });
 
   await updatePageProps(notion, page.id, propsBody);
+
+  console.log("Update Branch in Notion");
 };

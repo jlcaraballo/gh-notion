@@ -11,15 +11,19 @@ exports.createBrachevent = void 0;
 const getPageByCode_1 = __nccwpck_require__(4348);
 const client_1 = __nccwpck_require__(1103);
 const createBrachevent = async (notion, notionDatabase, branchName) => {
-    const matchs = branchName.match(/#\w*/);
+    const matchs = branchName.replace(/_/g, " ").match(/#\w*/);
     const code = matchs && matchs[0];
+    console.log({ branchName, matchs, code });
     if (!code)
         return;
-    const page = await (0, getPageByCode_1.getPageByCode)(notion, notionDatabase, code.replace("_", " "));
+    const page = await (0, getPageByCode_1.getPageByCode)(notion, notionDatabase, code);
+    console.log({ page });
     if (!page)
         return;
     const propBranch = page.properties["Branch"];
-    const oldBranchs = propBranch.rich_text.filter((item) => !item.text?.content?.include(branchName));
+    if (!propBranch)
+        return;
+    const oldBranchs = propBranch.rich_text.filter((item) => !item.text?.content?.includes(branchName));
     const propsBody = {
         Branch: {
             rich_text: [
@@ -27,13 +31,15 @@ const createBrachevent = async (notion, notionDatabase, branchName) => {
                 {
                     type: "text",
                     text: {
-                        content: oldBranchs?.length ? `, ${branchName}` : `${branchName}`,
+                        content: `${branchName}\n`,
                     },
                 },
             ],
         },
     };
+    console.log({ propsBody });
     await (0, client_1.updatePageProps)(notion, page.id, propsBody);
+    console.log("Update Branch in Notion");
 };
 exports.createBrachevent = createBrachevent;
 //# sourceMappingURL=createBrachEvent.js.map
@@ -58,6 +64,8 @@ const createCommitEvent = async (notion, notionDatabase, commit) => {
     if (!page)
         return;
     const propCommits = page.properties["Commits"];
+    if (!propCommits)
+        return;
     const porpBody = {
         Commits: {
             rich_text: [
@@ -75,6 +83,7 @@ const createCommitEvent = async (notion, notionDatabase, commit) => {
         },
     };
     await (0, client_1.updatePageProps)(notion, page.id, porpBody);
+    console.log("Update Commits in Notion");
 };
 exports.createCommitEvent = createCommitEvent;
 //# sourceMappingURL=createCommitEvent.js.map
@@ -126,7 +135,7 @@ const createPullRequestEvent = async (notion, notionDatabase, token_github, pull
     const prop = page.properties["Pull Requests"];
     if (!prop || !prop.rich_text)
         return;
-    const title = `${pull_request.state === "closed" ? "✅ " : ""}#${pull_request.number}`;
+    const title = `${pull_request.state === "closed" ? "✅ " : ""} #${pull_request.number}: ${pull_request.title}`;
     const oldsPR = prop.rich_text.filter((item) => item.text?.link?.url !== pull_request.html_url);
     const porpBody = {
         "Pull Requests": {
@@ -135,7 +144,7 @@ const createPullRequestEvent = async (notion, notionDatabase, token_github, pull
                 {
                     type: "text",
                     text: {
-                        content: oldsPR?.length ? `, ${title}` : `${title}`,
+                        content: `${title}\n`,
                         link: {
                             url: pull_request.html_url,
                         },
@@ -145,11 +154,13 @@ const createPullRequestEvent = async (notion, notionDatabase, token_github, pull
         },
     };
     await (0, client_1.updatePageProps)(notion, page.id, porpBody);
+    console.log("Update Pull Requests in Notion");
     await octokit.rest.issues.createComment({
         ...github.context.repo,
         issue_number: pull_request.number,
         body: `Notion task: ${page.url}`,
     });
+    console.log("comment added to pull request");
 };
 exports.createPullRequestEvent = createPullRequestEvent;
 //# sourceMappingURL=createPullRequestEvent.js.map
