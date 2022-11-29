@@ -21,9 +21,9 @@ export const getIssue = async (
 };
 
 export type PageProperty = {
-  branches?: any;
-  commits?: any;
-  prs?: any;
+  Branch?: any;
+  Commits?: any;
+  "Pull Requests"?: any;
 };
 
 export const getPage = async (notion: Client, page_id: string) => {
@@ -36,14 +36,10 @@ export const getPage = async (notion: Client, page_id: string) => {
 export const updatePageProps = async (
   notion: Client,
   page_id: string,
-  props: PageProperty
+  properties: PageProperty
 ) => {
   return await notion.pages.update({
     page_id,
-    properties: {
-      ...(props.branches ? { branches: props.branches } : {}),
-      ...(props.commits ? { Commits: props.commits } : {}),
-      ...(props.prs ? { "Pull Requests": props.prs } : {}),
-    },
+    properties,
   });
 };

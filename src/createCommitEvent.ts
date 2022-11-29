@@ -19,7 +19,7 @@ export const createCommitEvent = async (
   const propCommits = page.properties["Commits"];
 
   const porpBody = {
-    commits: {
+    Commits: {
       rich_text: [
         ...propCommits.rich_text,
         {

@@ -17,7 +17,7 @@ export const createBrachevent = async (
   const propBranch = page.properties["Branch"];
 
   const propsBody = {
-    branches: {
+    Branch: {
       rich_text: [
         ...propBranch.rich_text,
         {

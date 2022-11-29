@@ -32,7 +32,7 @@ export const createPullRequestEvent = async (
   );
 
   const porpBody = {
-    prs: {
+    "Pull Requests": {
       rich_text: [
         ...oldsPR,
         {
