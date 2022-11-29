@@ -20,6 +20,8 @@ export const createBrachevent = async (
 
   const propBranch = page.properties["Branch"];
 
+  if (!propBranch) return;
+
   const oldBranchs = propBranch.rich_text.filter(
     (item: any) => !item.text?.content?.include(branchName)
   );
@@ -39,4 +41,6 @@ export const createBrachevent = async (
   };
 
   await updatePageProps(notion, page.id, propsBody);
+
+  console.log("Update Branch in Notion");
 };

@@ -18,6 +18,8 @@ export const createCommitEvent = async (
 
   const propCommits = page.properties["Commits"];
 
+  if (!propCommits) return;
+
   const porpBody = {
     Commits: {
       rich_text: [
@@ -36,4 +38,6 @@ export const createCommitEvent = async (
   };
 
   await updatePageProps(notion, page.id, porpBody);
+
+  console.log("Update Commits in Notion");
 };
