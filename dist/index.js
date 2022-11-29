@@ -284,7 +284,7 @@ const updatePageProps = async (notion, page_id, props) => {
     return await notion.pages.update({
         page_id,
         properties: {
-            ...(props.branches ? { branches: props.branches } : {}),
+            ...(props.branches ? { Branch: props.branches } : {}),
             ...(props.commits ? { Commits: props.commits } : {}),
             ...(props.prs ? { "Pull Requests": props.prs } : {}),
         },
