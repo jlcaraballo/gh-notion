@@ -20,7 +20,7 @@ const createBrachevent = async (notion, notionDatabase, branchName) => {
         return;
     const propBranch = page.properties["Branch"];
     const propsBody = {
-        branches: {
+        Branch: {
             rich_text: [
                 ...propBranch.rich_text,
                 {
@@ -60,7 +60,7 @@ const createCommitEvent = async (notion, notionDatabase, commit) => {
         return;
     const propCommits = page.properties["Commits"];
     const porpBody = {
-        commits: {
+        Commits: {
             rich_text: [
                 ...propCommits.rich_text,
                 {
@@ -130,7 +130,7 @@ const createPullRequestEvent = async (notion, notionDatabase, token_github, pull
     const title = `${pull_request.state === "closed" ? "✅ " : ""}#${pull_request.number}`;
     const oldsPR = prop.rich_text.filter((item) => item.text?.link?.url !== pull_request.html_url);
     const porpBody = {
-        prs: {
+        "Pull Requests": {
             rich_text: [
                 ...oldsPR,
                 {
@@ -280,14 +280,10 @@ const getPage = async (notion, page_id) => {
     return page;
 };
 exports.getPage = getPage;
-const updatePageProps = async (notion, page_id, props) => {
+const updatePageProps = async (notion, page_id, properties) => {
     return await notion.pages.update({
         page_id,
-        properties: {
-            ...(props.branches ? { Branch: props.branches } : {}),
-            ...(props.commits ? { Commits: props.commits } : {}),
-            ...(props.prs ? { "Pull Requests": props.prs } : {}),
-        },
+        properties,
     });
 };
 exports.updatePageProps = updatePageProps;
