@@ -13,9 +13,11 @@ const client_1 = __nccwpck_require__(1103);
 const createBrachevent = async (notion, notionDatabase, branchName) => {
     const matchs = branchName.match(/#\w*/);
     const code = matchs && matchs[0];
+    console.log({ branchName, matchs, code });
     if (!code)
         return;
     const page = await (0, getPageByCode_1.getPageByCode)(notion, notionDatabase, code.replace("_", " "));
+    console.log({ page });
     if (!page)
         return;
     const propBranch = page.properties["Branch"];
@@ -35,6 +37,7 @@ const createBrachevent = async (notion, notionDatabase, branchName) => {
             ],
         },
     };
+    console.log({ propsBody });
     await (0, client_1.updatePageProps)(notion, page.id, propsBody);
     console.log("Update Branch in Notion");
 };

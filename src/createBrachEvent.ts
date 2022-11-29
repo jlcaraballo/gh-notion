@@ -9,6 +9,7 @@ export const createBrachevent = async (
 ) => {
   const matchs = branchName.match(/#\w*/);
   const code = matchs && matchs[0];
+  console.log({ branchName, matchs, code });
   if (!code) return;
 
   const page = await getPageByCode(
@@ -16,6 +17,7 @@ export const createBrachevent = async (
     notionDatabase,
     code.replace("_", " ")
   );
+  console.log({ page });
   if (!page) return;
 
   const propBranch = page.properties["Branch"];
@@ -39,6 +41,7 @@ export const createBrachevent = async (
       ],
     },
   };
+  console.log({ propsBody });
 
   await updatePageProps(notion, page.id, propsBody);
 
