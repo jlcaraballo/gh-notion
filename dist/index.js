@@ -230,6 +230,7 @@ const main = async () => {
     if (eventType === "push") {
         const push = github.context.payload;
         const branchName = push.ref.split("/").at(-1) || "";
+        console.log({ push, branchName });
         await (0, createBrachEvent_1.createBrachevent)(notion, notionDatabase, branchName);
         push.commits.forEach(async (commit) => await (0, createCommitEvent_1.createCommitEvent)(notion, notionDatabase, commit));
     }
