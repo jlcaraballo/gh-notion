@@ -2,7 +2,7 @@
 
 Sync your commits, branches and/or pull requests with an Notion issue.
 
-## Workflow
+## Workflows
 
 Create a `.github/workflow/{filename}.yml` file.
 
