@@ -153,11 +153,13 @@ const createPullRequestEvent = async (notion, notionDatabase, token_github, pull
     };
     await (0, client_1.updatePageProps)(notion, page.id, porpBody);
     console.log("Update Pull Requests in Notion");
-    await octokit.rest.issues.createComment({
-        ...github.context.repo,
-        issue_number: pull_request.number,
-        body: `Notion task: ${page.url}`,
-    });
+    if (pull_request.state === "open") {
+        await octokit.rest.issues.createComment({
+            ...github.context.repo,
+            issue_number: pull_request.number,
+            body: `Notion task: ${page.url}`,
+        });
+    }
     console.log("comment added to pull request");
 };
 exports.createPullRequestEvent = createPullRequestEvent;
@@ -235,6 +237,7 @@ const main = async () => {
         throw new Error("Notion DATABASE ID not found");
     const notion = (0, client_1.instance)(notionApiKey);
     const eventType = github.context.eventName;
+    console.log({ action: github.context.action });
     if (eventType === "push") {
         const push = github.context.payload;
         const branchName = push.ref.replace("refs/heads/", "");
