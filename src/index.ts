@@ -24,6 +24,8 @@ export const main = async () => {
 
   const eventType = github.context.eventName;
 
+  console.log({ action: github.context.action });
+
   if (eventType === "push") {
     const push = github.context.payload as PushEvent;
     const branchName = push.ref.replace("refs/heads/", "");
