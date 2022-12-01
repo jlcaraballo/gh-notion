@@ -49,13 +49,14 @@ export const createPullRequestEvent = async (
   };
   await updatePageProps(notion, page.id, porpBody);
 
-  console.log("Update Pull Requests in Notion");
+  console.log("Pull Requests updated in Notion");
 
-  await octokit.rest.issues.createComment({
-    ...github.context.repo,
-    issue_number: pull_request.number,
-    body: `Notion task: ${page.url}`,
-  });
-
-  console.log("comment added to pull request");
+  if (pull_request.state === "open") {
+    await octokit.rest.issues.createComment({
+      ...github.context.repo,
+      issue_number: pull_request.number,
+      body: `Notion task: ${page.url}`,
+    });
+    console.log("Comment added to pull request");
+  }
 };

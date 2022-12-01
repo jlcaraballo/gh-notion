@@ -37,7 +37,7 @@ const createBrachevent = async (notion, notionDatabase, branchName) => {
     };
     console.log({ propsBody });
     await (0, client_1.updatePageProps)(notion, page.id, propsBody);
-    console.log("Update Branch in Notion");
+    console.log("Branch added in Notion");
 };
 exports.createBrachevent = createBrachevent;
 //# sourceMappingURL=createBrachEvent.js.map
@@ -81,7 +81,7 @@ const createCommitEvent = async (notion, notionDatabase, commit) => {
         },
     };
     await (0, client_1.updatePageProps)(notion, page.id, porpBody);
-    console.log("Update Commits in Notion");
+    console.log("Commits added in Notion");
 };
 exports.createCommitEvent = createCommitEvent;
 //# sourceMappingURL=createCommitEvent.js.map
@@ -152,13 +152,15 @@ const createPullRequestEvent = async (notion, notionDatabase, token_github, pull
         },
     };
     await (0, client_1.updatePageProps)(notion, page.id, porpBody);
-    console.log("Update Pull Requests in Notion");
-    await octokit.rest.issues.createComment({
-        ...github.context.repo,
-        issue_number: pull_request.number,
-        body: `Notion task: ${page.url}`,
-    });
-    console.log("comment added to pull request");
+    console.log("Pull Requests updated in Notion");
+    if (pull_request.state === "open") {
+        await octokit.rest.issues.createComment({
+            ...github.context.repo,
+            issue_number: pull_request.number,
+            body: `Notion task: ${page.url}`,
+        });
+        console.log("Comment added to pull request");
+    }
 };
 exports.createPullRequestEvent = createPullRequestEvent;
 //# sourceMappingURL=createPullRequestEvent.js.map

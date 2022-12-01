@@ -24,7 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: GH to Notion
-        uses: jlcaraballo/gh-notion@v0.1.0
+        uses: jlcaraballo/gh-notion@v0.1.1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NOTION_SECRET: ${{ secrets.NOTION_SECRET }}

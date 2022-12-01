@@ -39,5 +39,5 @@ export const createCommitEvent = async (
 
   await updatePageProps(notion, page.id, porpBody);
 
-  console.log("Update Commits in Notion");
+  console.log("Commits added in Notion");
 };

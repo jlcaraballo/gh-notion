@@ -39,5 +39,5 @@ export const createBrachevent = async (
 
   await updatePageProps(notion, page.id, propsBody);
 
-  console.log("Update Branch in Notion");
+  console.log("Branch added in Notion");
 };
