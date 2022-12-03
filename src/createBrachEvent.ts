@@ -19,6 +19,7 @@ export const createBrachevent = async (
   if (!propBranch) return;
 
   const oldBranchs = propBranch.rich_text.filter(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (item: any) => !item.text?.content?.includes(branchName)
   );
 
