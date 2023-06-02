@@ -1,5 +1,5 @@
 import { Client } from "@notionhq/client";
-import { getPageByCode } from "./getPageByCode";
+import { findIssue } from "./getPage";
 import { updatePageProps } from "./services/client";
 
 export const createBrachevent = async (
@@ -11,7 +11,7 @@ export const createBrachevent = async (
   const code = matchs && matchs[0];
   if (!code) return;
 
-  const page = await getPageByCode(notion, notionDatabase, code);
+  const page = await findIssue(notion, notionDatabase, { code });
   if (!page) return;
 
   const propBranch = page.properties["Branch"];

@@ -24,7 +24,7 @@ export const main = async () => {
 
   const eventType = github.context.eventName;
 
-  console.log({ action: github.context.action });
+  console.log("EVENT TYPE", eventType);
 
   if (eventType === "push") {
     const push = github.context.payload as PushEvent;
@@ -44,7 +44,7 @@ export const main = async () => {
 };
 
 main()
-  .then(() => {})
+  .then(() => undefined)
   .catch((err) => {
     console.log("ERROR", err);
     core.setFailed(err.message);
