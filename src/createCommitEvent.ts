@@ -1,6 +1,6 @@
 import { Client } from "@notionhq/client";
 import { Commit } from "@octokit/webhooks-definitions/schema";
-import { getPageByCode } from "./getPageByCode";
+import { findIssue } from "./getPage";
 import { updatePageProps } from "./services/client";
 
 export const createCommitEvent = async (
@@ -13,7 +13,7 @@ export const createCommitEvent = async (
   const code = matchs && matchs[0];
   if (!code) return;
 
-  const page = await getPageByCode(notion, notionDatabase, code);
+  const page = await findIssue(notion, notionDatabase, code);
   if (!page) return;
 
   const propCommits = page.properties["Commits"];

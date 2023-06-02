@@ -1,16 +1,15 @@
 import { Client } from "@notionhq/client";
 import { getIssue, getPage } from "./services/client";
 
-export const getPageByCode = async (
+export const findIssue = async (
   notion: Client,
   notionDatabase: string,
-  code: string
+  { code, branch }: { code?: string; branch?: string }
 ) => {
-  const { results } = await getIssue(
-    notion,
-    notionDatabase,
-    code.replace("#", "")
-  );
+  const { results } = await getIssue(notion, notionDatabase, {
+    code: code ? code.replace("#", "") : undefined,
+    branch,
+  });
 
   const [issue] = results;
   if (!issue) return;
