@@ -24,7 +24,7 @@ export const main = async () => {
 
   const eventType = github.context.eventName;
 
-  console.log("EVENT TYPE", eventType);
+  console.log("EVENT TYPE:", eventType);
 
   if (eventType === "push") {
     const push = github.context.payload as PushEvent;

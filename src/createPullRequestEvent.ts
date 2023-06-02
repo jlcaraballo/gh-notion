@@ -19,8 +19,6 @@ export const createPullRequestEvent = async (
 
   const branch = pull_request.head.ref;
 
-  console.log({ code, branch }, JSON.stringify(pull_request));
-
   if (!code && !branch) return;
 
   const params = {
