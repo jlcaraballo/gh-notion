@@ -13,7 +13,7 @@ export const createCommitEvent = async (
   const code = matchs && matchs[0];
   if (!code) return;
 
-  const page = await findIssue(notion, notionDatabase, code);
+  const page = await findIssue(notion, notionDatabase, { code });
   if (!page) return;
 
   const propCommits = page.properties["Commits"];
