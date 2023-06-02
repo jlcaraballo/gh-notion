@@ -8,20 +8,22 @@
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.createBrachevent = void 0;
-const getPageByCode_1 = __nccwpck_require__(4348);
+const getPage_1 = __nccwpck_require__(4162);
 const client_1 = __nccwpck_require__(1103);
 const createBrachevent = async (notion, notionDatabase, branchName) => {
     const matchs = branchName.replace(/_/g, " ").match(/#\w*/);
     const code = matchs && matchs[0];
     if (!code)
         return;
-    const page = await (0, getPageByCode_1.getPageByCode)(notion, notionDatabase, code);
+    const page = await (0, getPage_1.findIssue)(notion, notionDatabase, { code });
     if (!page)
         return;
     const propBranch = page.properties["Branch"];
     if (!propBranch)
         return;
-    const oldBranchs = propBranch.rich_text.filter((item) => !item.text?.content?.includes(branchName));
+    const oldBranchs = propBranch.rich_text.filter(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (item) => !item.text?.content?.includes(branchName));
     const propsBody = {
         Branch: {
             rich_text: [
@@ -51,14 +53,14 @@ exports.createBrachevent = createBrachevent;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.createCommitEvent = void 0;
-const getPageByCode_1 = __nccwpck_require__(4348);
+const getPage_1 = __nccwpck_require__(4162);
 const client_1 = __nccwpck_require__(1103);
 const createCommitEvent = async (notion, notionDatabase, commit) => {
     const matchs = commit.message.match(/#\w*/);
     const code = matchs && matchs[0];
     if (!code)
         return;
-    const page = await (0, getPageByCode_1.getPageByCode)(notion, notionDatabase, code);
+    const page = await (0, getPage_1.findIssue)(notion, notionDatabase, { code });
     if (!page)
         return;
     const propCommits = page.properties["Commits"];
@@ -119,21 +121,32 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.createPullRequestEvent = void 0;
 const github = __importStar(__nccwpck_require__(5438));
-const getPageByCode_1 = __nccwpck_require__(4348);
+const getPage_1 = __nccwpck_require__(4162);
 const client_1 = __nccwpck_require__(1103);
 const createPullRequestEvent = async (notion, notionDatabase, token_github, pull_request) => {
     const octokit = github.getOctokit(token_github);
+    console.log("PULL REQUEST", JSON.stringify(pull_request));
     const matchs = pull_request.title.match(/#\w*/);
     const code = matchs && matchs[0];
-    if (!code)
+    const branch = pull_request.head.ref;
+    console.log({ code, branch }, JSON.stringify(pull_request));
+    if (!code && !branch)
         return;
-    const page = await (0, getPageByCode_1.getPageByCode)(notion, notionDatabase, code);
-    if (!page)
+    const params = {
+        code: code ?? undefined,
+        branch: branch ?? undefined,
+    };
+    console.log(`Find issue with code "${code}" and/or branch "${branch}" ...`);
+    const page = await (0, getPage_1.findIssue)(notion, notionDatabase, params);
+    if (!page) {
+        console.log("Issue page not found");
         return;
+    }
+    console.log(`Issue page found: ${page.url}`);
     const prop = page.properties["Pull Requests"];
     if (!prop || !prop.rich_text)
         return;
-    const title = `${pull_request.state === "closed" ? "✅ " : ""} #${pull_request.number}: ${pull_request.title}`;
+    const title = `${pull_request.merged ? "✅ " : ""} #${pull_request.number}: ${pull_request.title}`;
     const oldsPR = prop.rich_text.filter((item) => item.text?.link?.url !== pull_request.html_url);
     const porpBody = {
         "Pull Requests": {
@@ -151,8 +164,9 @@ const createPullRequestEvent = async (notion, notionDatabase, token_github, pull
             ],
         },
     };
+    console.log("Updating pull requests url in Notion...");
     await (0, client_1.updatePageProps)(notion, page.id, porpBody);
-    console.log("Pull Requests updated in Notion");
+    console.log("Pull Requests updated url in Notion");
     if (pull_request.state === "open") {
         await octokit.rest.issues.createComment({
             ...github.context.repo,
@@ -167,16 +181,19 @@ exports.createPullRequestEvent = createPullRequestEvent;
 
 /***/ }),
 
-/***/ 4348:
+/***/ 4162:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getPageByCode = void 0;
+exports.findIssue = void 0;
 const client_1 = __nccwpck_require__(1103);
-const getPageByCode = async (notion, notionDatabase, code) => {
-    const { results } = await (0, client_1.getIssue)(notion, notionDatabase, code.replace("#", ""));
+const findIssue = async (notion, notionDatabase, { code, branch }) => {
+    const { results } = await (0, client_1.getIssue)(notion, notionDatabase, {
+        code: code ? code.replace("#", "") : undefined,
+        branch,
+    });
     const [issue] = results;
     if (!issue)
         return;
@@ -184,8 +201,8 @@ const getPageByCode = async (notion, notionDatabase, code) => {
     const page = await (0, client_1.getPage)(notion, pageId);
     return page;
 };
-exports.getPageByCode = getPageByCode;
-//# sourceMappingURL=getPageByCode.js.map
+exports.findIssue = findIssue;
+//# sourceMappingURL=getPage.js.map
 
 /***/ }),
 
@@ -237,7 +254,7 @@ const main = async () => {
         throw new Error("Notion DATABASE ID not found");
     const notion = (0, client_1.instance)(notionApiKey);
     const eventType = github.context.eventName;
-    console.log({ action: github.context.action });
+    console.log("EVENT TYPE", eventType);
     if (eventType === "push") {
         const push = github.context.payload;
         const branchName = push.ref.replace("refs/heads/", "");
@@ -251,7 +268,7 @@ const main = async () => {
 };
 exports.main = main;
 (0, exports.main)()
-    .then(() => { })
+    .then(() => undefined)
     .catch((err) => {
     console.log("ERROR", err);
     core.setFailed(err.message);
@@ -270,16 +287,32 @@ exports.updatePageProps = exports.getPage = exports.getIssue = exports.instance 
 const client_1 = __nccwpck_require__(324);
 const instance = (token) => new client_1.Client({ auth: token });
 exports.instance = instance;
-const getIssue = async (notion, database_id, code) => {
-    return await notion.databases.query({
-        database_id,
-        filter: {
+const getIssue = async (notion, database_id, { code, branch }) => {
+    if (!code && !branch)
+        throw new Error("You must pass code or branch");
+    const filters = [];
+    if (code) {
+        filters.push({
             property: "Code",
             formula: {
                 string: {
-                    equals: code,
+                    equals: code || "",
                 },
             },
+        });
+    }
+    if (branch) {
+        filters.push({
+            property: "Branch",
+            rich_text: {
+                equals: branch || "",
+            },
+        });
+    }
+    return await notion.databases.query({
+        database_id,
+        filter: {
+            or: filters,
         },
     });
 };

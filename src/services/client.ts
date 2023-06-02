@@ -7,9 +7,7 @@ export const getIssue = async (
   database_id: string,
   { code, branch }: { code?: string; branch?: string }
 ) => {
-  if (!code && !branch) {
-    throw new Error("You must pass code or branch");
-  }
+  if (!code && !branch) throw new Error("You must pass code or branch");
 
   const filters = [];
   if (code) {

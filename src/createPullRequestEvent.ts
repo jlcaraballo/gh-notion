@@ -12,10 +12,15 @@ export const createPullRequestEvent = async (
 ) => {
   const octokit = github.getOctokit(token_github);
 
+  console.log("PULL REQUEST", JSON.stringify(pull_request));
+
   const matchs = pull_request.title.match(/#\w*/);
   const code = matchs && matchs[0];
 
   const branch = pull_request.head.ref;
+
+  console.log({ code, branch }, JSON.stringify(pull_request));
+
   if (!code && !branch) return;
 
   const params = {
