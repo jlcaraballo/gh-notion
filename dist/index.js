@@ -2636,7 +2636,12 @@ class Client {
         if (query) {
             for (const [key, value] of Object.entries(query)) {
                 if (value !== undefined) {
-                    url.searchParams.append(key, String(value));
+                    if (Array.isArray(value)) {
+                        value.forEach(val => url.searchParams.append(key, decodeURIComponent(val)));
+                    }
+                    else {
+                        url.searchParams.append(key, String(value));
+                    }
                 }
             }
         }
@@ -2722,7 +2727,7 @@ Client.defaultNotionVersion = "2022-06-28";
 
 "use strict";
 
-/* spell-checker: disable */
+// cspell:disable-file
 // Note: This is a generated file.
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.listComments = exports.createComment = exports.search = exports.createDatabase = exports.listDatabases = exports.queryDatabase = exports.updateDatabase = exports.getDatabase = exports.appendBlockChildren = exports.listBlockChildren = exports.deleteBlock = exports.updateBlock = exports.getBlock = exports.getPageProperty = exports.updatePage = exports.getPage = exports.createPage = exports.listUsers = exports.getUser = exports.getSelf = void 0;
@@ -2757,7 +2762,7 @@ exports.createPage = {
 exports.getPage = {
     method: "get",
     pathParams: ["page_id"],
-    queryParams: [],
+    queryParams: ["filter_properties"],
     bodyParams: [],
     path: (p) => `pages/${p.page_id}`,
 };
@@ -2865,7 +2870,7 @@ exports.updateDatabase = {
 exports.queryDatabase = {
     method: "post",
     pathParams: ["database_id"],
-    queryParams: [],
+    queryParams: ["filter_properties"],
     bodyParams: ["sorts", "filter", "start_cursor", "page_size", "archived"],
     path: (p) => `databases/${p.database_id}/query`,
 };
@@ -3170,7 +3175,7 @@ exports.iteratePaginatedAPI = iteratePaginatedAPI;
  * Example (given a notion Client called `notion`):
  *
  * ```
- * const blocks = collectPaginatedAPI(notion.blocks.children.list, {
+ * const blocks = await collectPaginatedAPI(notion.blocks.children.list, {
  *   block_id: parentBlockId,
  * })
  * // Do something with blocks.
@@ -10995,7 +11000,7 @@ module.exports = require("zlib");
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"@notionhq/client","version":"2.2.2","description":"A simple and easy to use client for the Notion API","engines":{"node":">=12"},"homepage":"https://developers.notion.com/docs/getting-started","bugs":{"url":"https://github.com/makenotion/notion-sdk-js/issues"},"repository":{"type":"git","url":"https://github.com/makenotion/notion-sdk-js/"},"keywords":["notion","notionapi","rest","notion-api"],"main":"./build/src","types":"./build/src/index.d.ts","scripts":{"prepare":"npm run build","prepublishOnly":"npm run checkLoggedIn && npm run lint && npm run test","build":"tsc","prettier":"prettier --write .","lint":"prettier --check . && eslint . --ext .ts && cspell \'**/*\' ","test":"jest ./test","check-links":"git ls-files | grep md$ | xargs -n 1 markdown-link-check","prebuild":"npm run clean","clean":"rm -rf ./build","checkLoggedIn":"./scripts/verifyLoggedIn.sh"},"author":"","license":"MIT","files":["build/package.json","build/src/**"],"dependencies":{"@types/node-fetch":"^2.5.10","node-fetch":"^2.6.1"},"devDependencies":{"@types/jest":"^28.1.4","@typescript-eslint/eslint-plugin":"^5.39.0","@typescript-eslint/parser":"^5.39.0","cspell":"^5.4.1","eslint":"^7.24.0","jest":"^28.1.2","markdown-link-check":"^3.8.7","prettier":"^2.3.0","ts-jest":"^28.0.5","typescript":"^4.8.4"}}');
+module.exports = JSON.parse('{"name":"@notionhq/client","version":"2.2.5","description":"A simple and easy to use client for the Notion API","engines":{"node":">=12"},"homepage":"https://developers.notion.com/docs/getting-started","bugs":{"url":"https://github.com/makenotion/notion-sdk-js/issues"},"repository":{"type":"git","url":"https://github.com/makenotion/notion-sdk-js/"},"keywords":["notion","notionapi","rest","notion-api"],"main":"./build/src","types":"./build/src/index.d.ts","scripts":{"prepare":"npm run build","prepublishOnly":"npm run checkLoggedIn && npm run lint && npm run test","build":"tsc","prettier":"prettier --write .","lint":"prettier --check . && eslint . --ext .ts && cspell \'**/*\' ","test":"jest ./test","check-links":"git ls-files | grep md$ | xargs -n 1 markdown-link-check","prebuild":"npm run clean","clean":"rm -rf ./build","checkLoggedIn":"./scripts/verifyLoggedIn.sh"},"author":"","license":"MIT","files":["build/package.json","build/src/**"],"dependencies":{"@types/node-fetch":"^2.5.10","node-fetch":"^2.6.1"},"devDependencies":{"@types/jest":"^28.1.4","@typescript-eslint/eslint-plugin":"^5.39.0","@typescript-eslint/parser":"^5.39.0","cspell":"^5.4.1","eslint":"^7.24.0","jest":"^28.1.2","markdown-link-check":"^3.8.7","prettier":"^2.8.8","ts-jest":"^28.0.5","typescript":"^4.8.4"}}');
 
 /***/ }),
 
