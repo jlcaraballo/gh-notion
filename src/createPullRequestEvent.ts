@@ -25,8 +25,6 @@ export const createPullRequestEvent = async (
 
   const branch = pull_request.head.ref;
 
-  console.log({ code, branch });
-
   if (!code && !branch) return;
 
   const params = {
@@ -70,9 +68,6 @@ export const createPullRequestEvent = async (
     "Pull Requests": {
       rich_text: [
         ...oldsPR,
-        ...(oldsPR.length > 0
-          ? [{ type: "text", text: { content: "\n" } }]
-          : []),
         {
           type: "text",
           text: {
@@ -93,7 +88,7 @@ export const createPullRequestEvent = async (
         {
           type: "text",
           text: {
-            content: `(${pullRequestStateCapitalized})`,
+            content: `(${pullRequestStateCapitalized})\n`,
             link: {
               url: pull_request.html_url,
             },
@@ -110,7 +105,13 @@ export const createPullRequestEvent = async (
       ],
     },
     ...(STATUS_GITHUB_TO_NOTION[pullRequestState]
-      ? { Status: STATUS_GITHUB_TO_NOTION[pullRequestState] }
+      ? {
+          Status: {
+            select: {
+              name: STATUS_GITHUB_TO_NOTION[pullRequestState],
+            },
+          },
+        }
       : {}),
   };
 
