@@ -129,7 +129,7 @@ const createPullRequestEvent = async (notion, notionDatabase, token_github, pull
     const matchs = pull_request.title.match(/#\w*/);
     const code = matchs && matchs[0];
     const branch = pull_request.head.ref;
-    console.log({ code, branch }, JSON.stringify(pull_request));
+    console.log({ code, branch });
     if (!code && !branch)
         return;
     const params = {
@@ -254,7 +254,7 @@ const main = async () => {
         throw new Error("Notion DATABASE ID not found");
     const notion = (0, client_1.instance)(notionApiKey);
     const eventType = github.context.eventName;
-    console.log("EVENT TYPE", eventType);
+    console.log("EVENT TYPE:", eventType);
     if (eventType === "push") {
         const push = github.context.payload;
         const branchName = push.ref.replace("refs/heads/", "");
