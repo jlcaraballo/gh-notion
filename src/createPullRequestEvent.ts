@@ -108,7 +108,7 @@ export const createPullRequestEvent = async (
     ...(STATUS_GITHUB_TO_NOTION[pullRequestState]
       ? {
           Status: {
-            select: {
+            status: {
               name: STATUS_GITHUB_TO_NOTION[pullRequestState],
             },
           },

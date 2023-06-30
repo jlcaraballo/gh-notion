@@ -202,7 +202,7 @@ const createPullRequestEvent = async (notion, notionDatabase, token_github, pull
         ...(STATUS_GITHUB_TO_NOTION[pullRequestState]
             ? {
                 Status: {
-                    select: {
+                    status: {
                         name: STATUS_GITHUB_TO_NOTION[pullRequestState],
                     },
                 },
