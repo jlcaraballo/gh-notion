@@ -6,6 +6,7 @@ on:
       - feature/**
       - bugfix/**
       - hotfix/**
+      - test/**
   pull_request:
     types: [opened, reopened, closed]
 
