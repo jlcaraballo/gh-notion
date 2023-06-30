@@ -14,11 +14,11 @@ export const createBrachevent = async (
 ) => {
   const matchs = branchName.replace(/_/g, " ").match(/#\w*/);
   const code = matchs && matchs[0];
-  if (!code) return;
+  if (!code && !branchName) return;
 
   const pages = await findIssues(notion, notionDatabase, {
-    code,
-    branch: branchName,
+    code: code ?? undefined,
+    branch: branchName ?? undefined,
   });
   if (!pages?.length) return;
 
