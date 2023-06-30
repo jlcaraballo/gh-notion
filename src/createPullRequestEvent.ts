@@ -1,6 +1,7 @@
 import * as github from "@actions/github";
 import { Client } from "@notionhq/client";
 import { PullRequest } from "@octokit/webhooks-definitions/schema";
+
 import { findIssue } from "./getPage";
 import { updatePageProps } from "./services/client";
 
