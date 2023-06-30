@@ -3,6 +3,9 @@ import { GetPageResponse } from "@notionhq/client/build/src/api-endpoints";
 
 import { findIssues } from "./utils/getPage";
 import { updatePageProps } from "./services/client";
+import { getStatus } from "./utils/getStatus";
+
+const NOTION_STATUS = getStatus();
 
 export const createBrachevent = async (
   notion: Client,
@@ -36,7 +39,7 @@ const updateNotionPage = async (
     "status" in page.properties["Status"]
       ? page.properties["Status"].status?.name
       : "";
-  const isInTodo = status === "Not Started";
+  const isInTodo = status === NOTION_STATUS["TODO"];
 
   if (!propBranch || !("rich_text" in propBranch)) return;
 
@@ -57,13 +60,14 @@ const updateNotionPage = async (
         },
       ],
     },
-    ...(isInTodo && {
-      Status: {
-        status: {
-          name: "In Progress",
+    ...(isInTodo &&
+      NOTION_STATUS["PROGRESS"] && {
+        Status: {
+          status: {
+            name: NOTION_STATUS["PROGRESS"],
+          },
         },
-      },
-    }),
+      }),
   };
 
   console.log({ propsBody });

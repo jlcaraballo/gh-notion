@@ -5,11 +5,14 @@ import { PullRequest } from "@octokit/webhooks-definitions/schema";
 
 import { findIssues } from "./utils/getPage";
 import { updatePageProps } from "./services/client";
+import { getStatus } from "./utils/getStatus";
+
+const NOTION_STATUS = getStatus();
 
 const STATUS_GITHUB_TO_NOTION = {
-  open: "In review",
-  merged: "Staged",
-  closed: "Done",
+  ...(NOTION_STATUS["DONE"] && { closed: NOTION_STATUS["DONE"] }),
+  ...(NOTION_STATUS["REVIEW"] && { open: NOTION_STATUS["REVIEW"] }),
+  ...(NOTION_STATUS["STAGED"] && { merged: NOTION_STATUS["STAGED"] }),
 };
 
 export const createPullRequestEvent = async (

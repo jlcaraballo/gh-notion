@@ -14,10 +14,6 @@ import { instance } from "./services/client";
 const token = core.getInput("GITHUB_TOKEN");
 const notionApiKey = core.getInput("NOTION_SECRET");
 const notionDatabase = core.getInput("NOTION_DATABASE");
-const statusline = core.getInput("NOTION_STATUS");
-const status = core.getMultilineInput("NOTION_STATUS");
-
-console.log({ status, statusline, env: process.env });
 
 export const main = async () => {
   if (!token) throw new Error("Github token not found");
