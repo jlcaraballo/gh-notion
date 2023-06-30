@@ -19,8 +19,8 @@ jobs:
         uses: ./
         env:
           NOTION_STATUS: |
-            TODO=Not started
-            PROGRESS=In progress
+            TODO=Not Started
+            PROGRESS=In Progress
             DONE=Done
             REVIEW=In review
             STAGED=Staged
