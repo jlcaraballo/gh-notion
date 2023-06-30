@@ -4,9 +4,10 @@ import { PullRequest } from "@octokit/webhooks-definitions/schema";
 import { findIssue } from "./getPage";
 import { updatePageProps } from "./services/client";
 
-const STATUS_GITHUB_TO_NOTION: Record<string, string> = {
-  opened: "In review",
+const STATUS_GITHUB_TO_NOTION = {
+  open: "In review",
   merged: "Staged",
+  closed: "Done",
 };
 
 export const createPullRequestEvent = async (
@@ -96,11 +97,9 @@ export const createPullRequestEvent = async (
         },
       ],
     },
-    Status: {
-      select: {
-        name: STATUS_GITHUB_TO_NOTION[pullRequestState],
-      },
-    },
+    ...(STATUS_GITHUB_TO_NOTION[pullRequestState]
+      ? { Status: STATUS_GITHUB_TO_NOTION[pullRequestState] }
+      : {}),
   };
 
   console.log("Updating pull requests url in Notion...");
