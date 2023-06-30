@@ -97,14 +97,14 @@ export const createPullRequestEvent = async (
             link: {
               url: pull_request.html_url,
             },
-            annotations: {
-              bold: true,
-              italic: false,
-              strikethrough: false,
-              underline: false,
-              code: false,
-              color: "gray_background",
-            },
+          },
+          annotations: {
+            bold: true,
+            italic: false,
+            strikethrough: false,
+            underline: false,
+            code: false,
+            color: "gray_background",
           },
         },
       ],
