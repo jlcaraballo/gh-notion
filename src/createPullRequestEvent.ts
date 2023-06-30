@@ -130,7 +130,7 @@ export const createPullRequestEvent = async (
     await octokit.rest.issues.createComment({
       ...github.context.repo,
       issue_number: pull_request.number,
-      body: `Notion task: [${pageName}](${page.url})]`,
+      body: `Notion task: [${pageName}](${page.url})`,
     });
     console.log("Comment added to pull request");
   }
