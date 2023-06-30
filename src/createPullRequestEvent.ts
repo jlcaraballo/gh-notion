@@ -81,7 +81,7 @@ export const createPullRequestEvent = async (
               url: pull_request.html_url,
             },
           },
-          anotations: {
+          annotations: {
             bold: true,
           },
         },
@@ -92,7 +92,7 @@ export const createPullRequestEvent = async (
             link: {
               url: pull_request.html_url,
             },
-            anotations: {
+            annotations: {
               color: "gray_background",
             },
           },
