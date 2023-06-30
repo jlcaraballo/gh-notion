@@ -10,6 +10,8 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.createBrachevent = void 0;
 const getPage_1 = __nccwpck_require__(1526);
 const client_1 = __nccwpck_require__(1103);
+const getStatus_1 = __nccwpck_require__(3204);
+const NOTION_STATUS = (0, getStatus_1.getStatus)();
 const createBrachevent = async (notion, notionDatabase, branchName) => {
     const matchs = branchName.replace(/_/g, " ").match(/#\w*/);
     const code = matchs && matchs[0];
@@ -33,7 +35,7 @@ const updateNotionPage = async (notion, page, branchName) => {
     const status = "status" in page.properties["Status"]
         ? page.properties["Status"].status?.name
         : "";
-    const isInTodo = status === "Not Started";
+    const isInTodo = status === NOTION_STATUS["TODO"];
     if (!propBranch || !("rich_text" in propBranch))
         return;
     const oldBranchs = propBranch.rich_text.filter(
@@ -51,10 +53,11 @@ const updateNotionPage = async (notion, page, branchName) => {
                 },
             ],
         },
-        ...(isInTodo && {
+        ...(isInTodo &&
+            NOTION_STATUS["PROGRESS"] && {
             Status: {
                 status: {
-                    name: "In Progress",
+                    name: NOTION_STATUS["PROGRESS"],
                 },
             },
         }),
@@ -151,10 +154,12 @@ exports.createPullRequestEvent = void 0;
 const github = __importStar(__nccwpck_require__(5438));
 const getPage_1 = __nccwpck_require__(1526);
 const client_1 = __nccwpck_require__(1103);
+const getStatus_1 = __nccwpck_require__(3204);
+const NOTION_STATUS = (0, getStatus_1.getStatus)();
 const STATUS_GITHUB_TO_NOTION = {
-    open: "In review",
-    merged: "Staged",
-    closed: "Done",
+    ...(NOTION_STATUS["DONE"] && { closed: NOTION_STATUS["DONE"] }),
+    ...(NOTION_STATUS["REVIEW"] && { open: NOTION_STATUS["REVIEW"] }),
+    ...(NOTION_STATUS["STAGED"] && { merged: NOTION_STATUS["STAGED"] }),
 };
 const createPullRequestEvent = async (notion, notionDatabase, token_github, pull_request) => {
     const octokit = github.getOctokit(token_github);
@@ -315,9 +320,6 @@ const client_1 = __nccwpck_require__(1103);
 const token = core.getInput("GITHUB_TOKEN");
 const notionApiKey = core.getInput("NOTION_SECRET");
 const notionDatabase = core.getInput("NOTION_DATABASE");
-const statusline = core.getInput("NOTION_STATUS");
-const status = core.getMultilineInput("NOTION_STATUS");
-console.log({ status, statusline, env: process.env });
 const main = async () => {
     if (!token)
         throw new Error("Github token not found");
@@ -432,6 +434,41 @@ const findIssues = async (notion, notionDatabase, { code, branch }) => {
 };
 exports.findIssues = findIssues;
 //# sourceMappingURL=getPage.js.map
+
+/***/ }),
+
+/***/ 3204:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getStatus = exports.EStatus = void 0;
+var EStatus;
+(function (EStatus) {
+    EStatus["TODO"] = "TODO";
+    EStatus["PROGRESS"] = "PROGRESS";
+    EStatus["DONE"] = "DONE";
+    EStatus["REVIEW"] = "REVIEW";
+    EStatus["STAGED"] = "STAGED";
+})(EStatus = exports.EStatus || (exports.EStatus = {}));
+const getStatus = () => {
+    const statusMultiline = process.env.NOTION_STATUS;
+    if (!statusMultiline?.length)
+        return {};
+    const status = statusMultiline
+        .split("\n")
+        .map((line) => {
+        const [githubStatus, notionStatus] = line.split("=");
+        return { [githubStatus]: notionStatus };
+    })
+        .reduce((acc, curr) => ({ ...acc, ...curr }), {});
+    if (!status)
+        return {};
+    return status;
+};
+exports.getStatus = getStatus;
+//# sourceMappingURL=getStatus.js.map
 
 /***/ }),
 
