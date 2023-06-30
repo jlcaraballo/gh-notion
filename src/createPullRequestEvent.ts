@@ -1,8 +1,9 @@
 import * as github from "@actions/github";
 import { Client } from "@notionhq/client";
+import { GetPageResponse } from "@notionhq/client/build/src/api-endpoints";
 import { PullRequest } from "@octokit/webhooks-definitions/schema";
 
-import { findIssue } from "./getPage";
+import { findIssues } from "./utils/getPage";
 import { updatePageProps } from "./services/client";
 
 const STATUS_GITHUB_TO_NOTION = {
@@ -41,15 +42,50 @@ export const createPullRequestEvent = async (
     console.log(`Find issue with branch "${branch}" ...`);
   }
 
-  const page = await findIssue(notion, notionDatabase, params);
-  if (!page) {
+  const pages = await findIssues(notion, notionDatabase, params);
+  if (!pages) {
     console.log("Issue page not found");
     return;
   }
 
+  for (const page of pages) {
+    await updateNotionPage(notion, page, pull_request);
+  }
+
+  // Add comment to pull request
+  if (pull_request.state === "open") {
+    const pagesBody = pages
+      .map((page) => {
+        if (!("properties" in page)) return;
+        if (!("title" in page.properties["Task name"])) return;
+        const pageName = page.properties["Task name"].title[0].plain_text;
+        return `[${pageName}](${page.url})`;
+      })
+      .filter(Boolean)
+      .join("\n");
+
+    console.log("Adding comment to pull request...");
+
+    await octokit.rest.issues.createComment({
+      ...github.context.repo,
+      issue_number: pull_request.number,
+      body: pagesBody,
+    });
+    console.log("Comment added to pull request");
+  }
+};
+
+const updateNotionPage = async (
+  notion: Client,
+  page: GetPageResponse,
+  pull_request: PullRequest
+) => {
+  if (!("properties" in page)) return;
   console.log(`Issue page found: ${page.url}`);
 
   const prop = page.properties["Pull Requests"];
+
+  if (!("rich_text" in prop)) return;
 
   if (!prop || !prop.rich_text) return;
 
@@ -121,17 +157,4 @@ export const createPullRequestEvent = async (
   await updatePageProps(notion, page.id, propBody);
 
   console.log("Pull Requests updated url in Notion");
-
-  if (pull_request.state === "open") {
-    const pageName = page.properties["Task name"].title[0].plain_text;
-
-    console.log("Adding comment to pull request...");
-
-    await octokit.rest.issues.createComment({
-      ...github.context.repo,
-      issue_number: pull_request.number,
-      body: `Notion task: [${pageName}](${page.url})`,
-    });
-    console.log("Comment added to pull request");
-  }
 };

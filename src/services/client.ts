@@ -1,4 +1,5 @@
 import { Client } from "@notionhq/client";
+import { GetPageResponse } from "@notionhq/client/build/src/api-endpoints";
 
 export const instance = (token: string) => new Client({ auth: token });
 
@@ -44,8 +45,11 @@ export type PageProperty = {
   "Pull Requests"?: any;
 };
 
-export const getPage = async (notion: Client, page_id: string) => {
-  const page: any = await notion.pages.retrieve({
+export const getPage = async (
+  notion: Client,
+  page_id: string
+): Promise<GetPageResponse> => {
+  const page = await notion.pages.retrieve({
     page_id,
   });
   return page;

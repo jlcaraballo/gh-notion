@@ -9,6 +9,8 @@ on:
   pull_request:
     types: [opened, reopened, closed]
 
+env:
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -16,6 +18,13 @@ jobs:
       - uses: actions/checkout@v2
       - name: GH to Notion
         uses: ./
+        env:
+          NOTION_STATUS: |
+            TODO="Not started"
+            PROGRESS="In progress"
+            DONE="Done"
+            REVIEW="In review"
+            STAGED="Staged"
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NOTION_SECRET: ${{ secrets.NOTION_SECRET }}
