@@ -175,7 +175,7 @@ const createPullRequestEvent = async (notion, notionDatabase, token_github, pull
                             url: pull_request.html_url,
                         },
                     },
-                    anotations: {
+                    annotations: {
                         bold: true,
                     },
                 },
@@ -186,7 +186,7 @@ const createPullRequestEvent = async (notion, notionDatabase, token_github, pull
                         link: {
                             url: pull_request.html_url,
                         },
-                        anotations: {
+                        annotations: {
                             color: "gray_background",
                         },
                     },
