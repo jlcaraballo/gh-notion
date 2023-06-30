@@ -1,6 +1,6 @@
 {
   "name": "gh-notion",
-  "version": "v0.2.2",
+  "version": "v0.2.3",
   "main": "dist/index.js",
   "repository": "git@github.com:jlcaraballo/gh-notion.git",
   "author": "Jorge Caraballo <jorgelcs85@gmail.com>",

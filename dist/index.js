@@ -124,8 +124,9 @@ const github = __importStar(__nccwpck_require__(5438));
 const getPage_1 = __nccwpck_require__(4162);
 const client_1 = __nccwpck_require__(1103);
 const STATUS_GITHUB_TO_NOTION = {
-    opened: "In review",
+    open: "In review",
     merged: "Staged",
+    closed: "Done",
 };
 const createPullRequestEvent = async (notion, notionDatabase, token_github, pull_request) => {
     const octokit = github.getOctokit(token_github);
@@ -192,11 +193,9 @@ const createPullRequestEvent = async (notion, notionDatabase, token_github, pull
                 },
             ],
         },
-        Status: {
-            select: {
-                name: STATUS_GITHUB_TO_NOTION[pullRequestState],
-            },
-        },
+        ...(STATUS_GITHUB_TO_NOTION[pullRequestState]
+            ? { Status: STATUS_GITHUB_TO_NOTION[pullRequestState] }
+            : {}),
     };
     console.log("Updating pull requests url in Notion...");
     await (0, client_1.updatePageProps)(notion, page.id, propBody);
