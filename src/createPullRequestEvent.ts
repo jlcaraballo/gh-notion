@@ -25,6 +25,8 @@ export const createPullRequestEvent = async (
 
   const branch = pull_request.head.ref;
 
+  console.log({ code, branch });
+
   if (!code && !branch) return;
 
   const params = {
@@ -97,9 +99,17 @@ export const createPullRequestEvent = async (
         },
       ],
     },
+<<<<<<< HEAD
     ...(STATUS_GITHUB_TO_NOTION[pullRequestState]
       ? { Status: STATUS_GITHUB_TO_NOTION[pullRequestState] }
       : {}),
+=======
+    Status: {
+      select: {
+        name: STATUS_GITHUB_TO_NOTION[pullRequestState],
+      },
+    },
+>>>>>>> 36d23e529f80919085eb8927e27821b084e66faf
   };
 
   console.log("Updating pull requests url in Notion...");
