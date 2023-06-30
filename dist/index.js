@@ -134,7 +134,6 @@ const createPullRequestEvent = async (notion, notionDatabase, token_github, pull
     const matchs = pull_request.title.match(/#\w*/);
     const code = matchs && matchs[0];
     const branch = pull_request.head.ref;
-    console.log({ code, branch });
     if (!code && !branch)
         return;
     const params = {
@@ -164,9 +163,6 @@ const createPullRequestEvent = async (notion, notionDatabase, token_github, pull
         "Pull Requests": {
             rich_text: [
                 ...oldsPR,
-                ...(oldsPR.length > 0
-                    ? [{ type: "text", text: { content: "\n" } }]
-                    : []),
                 {
                     type: "text",
                     text: {
@@ -187,7 +183,7 @@ const createPullRequestEvent = async (notion, notionDatabase, token_github, pull
                 {
                     type: "text",
                     text: {
-                        content: `(${pullRequestStateCapitalized})`,
+                        content: `(${pullRequestStateCapitalized})\n`,
                         link: {
                             url: pull_request.html_url,
                         },
@@ -204,7 +200,13 @@ const createPullRequestEvent = async (notion, notionDatabase, token_github, pull
             ],
         },
         ...(STATUS_GITHUB_TO_NOTION[pullRequestState]
-            ? { Status: STATUS_GITHUB_TO_NOTION[pullRequestState] }
+            ? {
+                Status: {
+                    select: {
+                        name: STATUS_GITHUB_TO_NOTION[pullRequestState],
+                    },
+                },
+            }
             : {}),
     };
     console.log("Updating pull requests url in Notion...");
