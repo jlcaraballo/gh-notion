@@ -4,6 +4,11 @@ import { PullRequest } from "@octokit/webhooks-definitions/schema";
 import { findIssue } from "./getPage";
 import { updatePageProps } from "./services/client";
 
+const STATUS_GITHUB_TO_NOTION: Record<string, string> = {
+  opened: "In review",
+  merged: "Staged",
+};
+
 export const createPullRequestEvent = async (
   notion: Client,
   notionDatabase: string,
@@ -12,14 +17,12 @@ export const createPullRequestEvent = async (
 ) => {
   const octokit = github.getOctokit(token_github);
 
-  console.log("PULL REQUEST", JSON.stringify(pull_request));
+  console.log("PULL REQUEST", pull_request.title);
 
   const matchs = pull_request.title.match(/#\w*/);
   const code = matchs && matchs[0];
 
   const branch = pull_request.head.ref;
-
-  console.log({ code, branch });
 
   if (!code && !branch) return;
 
@@ -28,7 +31,13 @@ export const createPullRequestEvent = async (
     branch: branch ?? undefined,
   };
 
-  console.log(`Find issue with code "${code}" and/or branch "${branch}" ...`);
+  if (code) {
+    console.log(`Find issue with code "${code}" ...`);
+  }
+
+  if (branch) {
+    console.log(`Find issue with branch "${branch}" ...`);
+  }
 
   const page = await findIssue(notion, notionDatabase, params);
   if (!page) {
@@ -50,34 +59,65 @@ export const createPullRequestEvent = async (
     (item: any) => item.text?.link?.url !== pull_request.html_url
   );
 
-  const porpBody = {
+  const pullRequestState = pull_request.merged ? "merged" : pull_request.state;
+  const pullRequestStateCapitalized =
+    pullRequestState.charAt(0).toUpperCase() + pullRequestState.slice(1);
+
+  const propBody = {
     "Pull Requests": {
       rich_text: [
         ...oldsPR,
+        ...(oldsPR.length > 0
+          ? [{ type: "text", text: { content: "\n" } }]
+          : []),
         {
           type: "text",
           text: {
-            content: `${title}\n`,
+            content: `${title} `,
             link: {
               url: pull_request.html_url,
+            },
+          },
+          anotations: {
+            bold: true,
+          },
+        },
+        {
+          type: "text",
+          text: {
+            content: `(${pullRequestStateCapitalized})`,
+            link: {
+              url: pull_request.html_url,
+            },
+            anotations: {
+              color: "gray_background",
             },
           },
         },
       ],
     },
+    Status: {
+      select: {
+        name: STATUS_GITHUB_TO_NOTION[pullRequestState],
+      },
+    },
   };
 
   console.log("Updating pull requests url in Notion...");
 
-  await updatePageProps(notion, page.id, porpBody);
+  await updatePageProps(notion, page.id, propBody);
 
   console.log("Pull Requests updated url in Notion");
 
   if (pull_request.state === "open") {
+    const pageName = page.properties["Task name"].title[0].plain_text;
+
+    console.log("Adding comment to pull request...");
+
     await octokit.rest.issues.createComment({
       ...github.context.repo,
       issue_number: pull_request.number,
-      body: `Notion task: ${page.url}`,
+      body: `Notion task: [${pageName}](${page.url})]`,
     });
     console.log("Comment added to pull request");
   }
