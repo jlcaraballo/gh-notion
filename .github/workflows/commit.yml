@@ -20,11 +20,11 @@ jobs:
         uses: ./
         env:
           NOTION_STATUS: |
-            TODO="Not started"
-            PROGRESS="In progress"
-            DONE="Done"
-            REVIEW="In review"
-            STAGED="Staged"
+            TODO=Not started
+            PROGRESS=In progress
+            DONE=Done
+            REVIEW=In review
+            STAGED=Staged
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NOTION_SECRET: ${{ secrets.NOTION_SECRET }}
