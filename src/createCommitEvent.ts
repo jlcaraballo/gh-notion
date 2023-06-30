@@ -1,6 +1,8 @@
 import { Client } from "@notionhq/client";
+import { GetPageResponse } from "@notionhq/client/build/src/api-endpoints";
 import { Commit } from "@octokit/webhooks-definitions/schema";
-import { findIssue } from "./getPage";
+
+import { findIssues } from "./utils/getPage";
 import { updatePageProps } from "./services/client";
 
 export const createCommitEvent = async (
@@ -13,12 +15,22 @@ export const createCommitEvent = async (
   const code = matchs && matchs[0];
   if (!code) return;
 
-  const page = await findIssue(notion, notionDatabase, { code });
-  if (!page) return;
+  const pages = await findIssues(notion, notionDatabase, { code });
+  if (!pages) return;
+  for (const page of pages) {
+    await updateNotionPage(notion, page, commit);
+  }
+};
 
+const updateNotionPage = async (
+  notion: Client,
+  page: GetPageResponse,
+  commit: Commit
+): Promise<void> => {
+  if (!("properties" in page)) return;
   const propCommits = page.properties["Commits"];
 
-  if (!propCommits) return;
+  if (!propCommits || !("rich_text" in propCommits)) return;
 
   const porpBody = {
     Commits: {
