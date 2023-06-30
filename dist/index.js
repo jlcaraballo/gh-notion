@@ -177,6 +177,11 @@ const createPullRequestEvent = async (notion, notionDatabase, token_github, pull
                     },
                     annotations: {
                         bold: true,
+                        italic: false,
+                        strikethrough: false,
+                        underline: false,
+                        code: false,
+                        color: "default",
                     },
                 },
                 {
@@ -187,6 +192,11 @@ const createPullRequestEvent = async (notion, notionDatabase, token_github, pull
                             url: pull_request.html_url,
                         },
                         annotations: {
+                            bold: true,
+                            italic: false,
+                            strikethrough: false,
+                            underline: false,
+                            code: false,
                             color: "gray_background",
                         },
                     },

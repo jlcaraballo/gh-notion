@@ -84,6 +84,11 @@ export const createPullRequestEvent = async (
           },
           annotations: {
             bold: true,
+            italic: false,
+            strikethrough: false,
+            underline: false,
+            code: false,
+            color: "default",
           },
         },
         {
@@ -94,6 +99,11 @@ export const createPullRequestEvent = async (
               url: pull_request.html_url,
             },
             annotations: {
+              bold: true,
+              italic: false,
+              strikethrough: false,
+              underline: false,
+              code: false,
               color: "gray_background",
             },
           },
