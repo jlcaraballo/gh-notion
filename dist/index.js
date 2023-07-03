@@ -377,7 +377,7 @@ const getIssue = async (notion, database_id, { code, branch }) => {
             property: "Code",
             formula: {
                 string: {
-                    equals: code || "",
+                    contains: code || "",
                 },
             },
         });
@@ -386,7 +386,7 @@ const getIssue = async (notion, database_id, { code, branch }) => {
         filters.push({
             property: "Branch",
             rich_text: {
-                equals: branch || "",
+                contains: branch || "",
             },
         });
     }
