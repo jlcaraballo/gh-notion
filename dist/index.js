@@ -15,11 +15,11 @@ const NOTION_STATUS = (0, getStatus_1.getStatus)();
 const createBrachevent = async (notion, notionDatabase, branchName) => {
     const matchs = branchName.replace(/_/g, " ").match(/#\w*/);
     const code = matchs && matchs[0];
-    if (!code)
+    if (!code && !branchName)
         return;
     const pages = await (0, getPage_1.findIssues)(notion, notionDatabase, {
-        code,
-        branch: branchName,
+        code: code ?? undefined,
+        branch: branchName ?? undefined,
     });
     if (!pages?.length)
         return;
