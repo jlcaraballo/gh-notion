@@ -16,7 +16,7 @@ export const getIssue = async (
       property: "Code",
       formula: {
         string: {
-          equals: code || "",
+          contains: code || "",
         },
       },
     });
@@ -26,7 +26,7 @@ export const getIssue = async (
     filters.push({
       property: "Branch",
       rich_text: {
-        equals: branch || "",
+        contains: branch || "",
       },
     });
   }
