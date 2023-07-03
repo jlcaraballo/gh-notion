@@ -55,7 +55,13 @@ const updateNotionPage = async (
         {
           type: "text",
           text: {
-            content: `${branchName}\n`,
+            content: `${branchName}`,
+          },
+        },
+        {
+          type: "text",
+          text: {
+            content: "\n",
           },
         },
       ],
