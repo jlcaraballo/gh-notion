@@ -41,6 +41,26 @@ export const main = async () => {
     const { pull_request } = github.context.payload as PullRequestEvent;
     await createPullRequestEvent(notion, notionDatabase, token, pull_request);
   }
+
+  if (eventType === "release") {
+    // TODO: move to another file
+    const octokit = github.getOctokit(token);
+
+    const owner = github.context.repo.owner;
+    const release = github.context.payload.release;
+    const repo = github.context.repo.repo;
+    const releaseTag = release.tag_name;
+
+    octokit.rest.pulls.list({
+      owner,
+      repo,
+      state: "closed",
+      base: releaseTag,
+    });
+
+    // TODO: by each pull request, find the issue and update
+    // the version property with the release tag
+  }
 };
 
 main()
