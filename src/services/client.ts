@@ -11,6 +11,7 @@ export const getIssue = async (
   if (!code && !branch) throw new Error("You must pass code or branch");
 
   const filters = [];
+
   if (code) {
     filters.push({
       property: "Code",
