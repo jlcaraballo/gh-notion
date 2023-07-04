@@ -23,7 +23,7 @@ jobs:
             PROGRESS=In Progress
             DONE=Done
             REVIEW=In review
-            STAGED=Staged
+            MERGED=Staged
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NOTION_SECRET: ${{ secrets.NOTION_SECRET }}

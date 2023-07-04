@@ -48,7 +48,13 @@ const updateNotionPage = async (notion, page, branchName) => {
                 {
                     type: "text",
                     text: {
-                        content: `${branchName}\n`,
+                        content: `${branchName}`,
+                    },
+                },
+                {
+                    type: "text",
+                    text: {
+                        content: "\n",
                     },
                 },
             ],
@@ -159,7 +165,7 @@ const NOTION_STATUS = (0, getStatus_1.getStatus)();
 const STATUS_GITHUB_TO_NOTION = {
     ...(NOTION_STATUS["DONE"] && { closed: NOTION_STATUS["DONE"] }),
     ...(NOTION_STATUS["REVIEW"] && { open: NOTION_STATUS["REVIEW"] }),
-    ...(NOTION_STATUS["STAGED"] && { merged: NOTION_STATUS["STAGED"] }),
+    ...(NOTION_STATUS["MERGED"] && { merged: NOTION_STATUS["MERGED"] }),
 };
 const createPullRequestEvent = async (notion, notionDatabase, token_github, pull_request) => {
     const octokit = github.getOctokit(token_github);
@@ -371,7 +377,7 @@ const getIssue = async (notion, database_id, { code, branch }) => {
             property: "Code",
             formula: {
                 string: {
-                    equals: code || "",
+                    contains: code || "",
                 },
             },
         });
@@ -380,7 +386,7 @@ const getIssue = async (notion, database_id, { code, branch }) => {
         filters.push({
             property: "Branch",
             rich_text: {
-                equals: branch || "",
+                contains: branch || "",
             },
         });
     }
@@ -450,7 +456,7 @@ var EStatus;
     EStatus["PROGRESS"] = "PROGRESS";
     EStatus["DONE"] = "DONE";
     EStatus["REVIEW"] = "REVIEW";
-    EStatus["STAGED"] = "STAGED";
+    EStatus["MERGED"] = "MERGED";
 })(EStatus = exports.EStatus || (exports.EStatus = {}));
 const getStatus = () => {
     const statusMultiline = process.env.NOTION_STATUS;

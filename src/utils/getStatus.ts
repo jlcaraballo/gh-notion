@@ -3,7 +3,7 @@ export enum EStatus {
   PROGRESS = "PROGRESS",
   DONE = "DONE",
   REVIEW = "REVIEW",
-  STAGED = "STAGED",
+  MERGED = "MERGED",
 }
 
 export const getStatus = (): { [x in EStatus]?: string } => {

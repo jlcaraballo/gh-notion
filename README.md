@@ -28,14 +28,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: GH to Notion
-        uses: jlcaraballo/gh-notion@v0.2.3
+        uses: jlcaraballo/gh-notion@v1.0.3
         env:
           NOTION_STATUS: |
             TODO=Not Started
             PROGRESS=In Progress
             DONE=Done
             REVIEW=In review
-            STAGED=Staged
+            MERGED=Staged
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NOTION_SECRET: ${{ secrets.NOTION_SECRET }}
@@ -58,7 +58,7 @@ jobs:
    - In Progress
    - Done
    - In review
-   - Staged
+   - Merged
 
 ### Github
 
@@ -109,8 +109,8 @@ git commit -m '#a2b3c4 first commit'
 The status change in the following cases:
 
 1. When you create a branch and the status is `Not Started` the status will be updated to `In Progress`.
-1. When you create a pull request and the status is `In Progress` the status will be updated to `In review`.
-1. When you merge a pull request and the status is `In review` the status will be updated to `Staged`.
+1. When you create a pull request the status will be updated to `In review`.
+1. When you merge a pull request the status will be updated to `Merged`.
 
 ## License
 
