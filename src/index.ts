@@ -35,6 +35,26 @@ export const main = async () => {
     push.commits.forEach(
       async (commit) => await createCommitEvent(notion, notionDatabase, commit)
     );
+
+    if (push.ref.includes("refs/tags/")) {
+      const octokit = github.getOctokit(token);
+
+      const tag = push.ref.replace("refs/tags/", "");
+
+      console.log("New tag created:", tag);
+
+      const owner = github.context.repo.owner;
+      const repo = github.context.repo.repo;
+
+      const { data: pullRequest } = await octokit.rest.pulls.list({
+        owner,
+        repo,
+        state: "closed",
+        base: tag,
+      });
+
+      console.log("PULL REQUEST", JSON.stringify(pullRequest, null, 2));
+    }
   }
 
   if (eventType === "pull_request") {
@@ -50,13 +70,18 @@ export const main = async () => {
     const release = github.context.payload.release;
     const repo = github.context.repo.repo;
     const releaseTag = release.tag_name;
+    const releaseName = release.name;
 
-    octokit.rest.pulls.list({
+    console.log("New release created:", releaseTag, releaseName);
+
+    const { data: pullRequest } = await octokit.rest.pulls.list({
       owner,
       repo,
       state: "closed",
       base: releaseTag,
     });
+
+    console.log("PULL REQUEST", JSON.stringify(pullRequest, null, 2));
 
     // TODO: by each pull request, find the issue and update
     // the version property with the release tag
