@@ -12,7 +12,7 @@ const NOTION_STATUS = getStatus();
 const STATUS_GITHUB_TO_NOTION = {
   ...(NOTION_STATUS["DONE"] && { closed: NOTION_STATUS["DONE"] }),
   ...(NOTION_STATUS["REVIEW"] && { open: NOTION_STATUS["REVIEW"] }),
-  ...(NOTION_STATUS["STAGED"] && { merged: NOTION_STATUS["STAGED"] }),
+  ...(NOTION_STATUS["MERGED"] && { merged: NOTION_STATUS["MERGED"] }),
 };
 
 export const createPullRequestEvent = async (

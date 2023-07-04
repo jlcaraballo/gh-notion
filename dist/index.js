@@ -165,7 +165,7 @@ const NOTION_STATUS = (0, getStatus_1.getStatus)();
 const STATUS_GITHUB_TO_NOTION = {
     ...(NOTION_STATUS["DONE"] && { closed: NOTION_STATUS["DONE"] }),
     ...(NOTION_STATUS["REVIEW"] && { open: NOTION_STATUS["REVIEW"] }),
-    ...(NOTION_STATUS["STAGED"] && { merged: NOTION_STATUS["STAGED"] }),
+    ...(NOTION_STATUS["MERGED"] && { merged: NOTION_STATUS["MERGED"] }),
 };
 const createPullRequestEvent = async (notion, notionDatabase, token_github, pull_request) => {
     const octokit = github.getOctokit(token_github);
@@ -456,7 +456,7 @@ var EStatus;
     EStatus["PROGRESS"] = "PROGRESS";
     EStatus["DONE"] = "DONE";
     EStatus["REVIEW"] = "REVIEW";
-    EStatus["STAGED"] = "STAGED";
+    EStatus["MERGED"] = "MERGED";
 })(EStatus = exports.EStatus || (exports.EStatus = {}));
 const getStatus = () => {
     const statusMultiline = process.env.NOTION_STATUS;
