@@ -341,10 +341,43 @@ const main = async () => {
         const branchName = push.ref.replace("refs/heads/", "");
         await (0, createBrachEvent_1.createBrachevent)(notion, notionDatabase, branchName);
         push.commits.forEach(async (commit) => await (0, createCommitEvent_1.createCommitEvent)(notion, notionDatabase, commit));
+        if (push.ref.includes("refs/tags/")) {
+            const octokit = github.getOctokit(token);
+            const tag = push.ref.replace("refs/tags/", "");
+            console.log("New tag created:", tag);
+            const owner = github.context.repo.owner;
+            const repo = github.context.repo.repo;
+            const { data: pullRequest } = await octokit.rest.pulls.list({
+                owner,
+                repo,
+                state: "closed",
+                base: tag,
+            });
+            console.log("PULL REQUEST", JSON.stringify(pullRequest, null, 2));
+        }
     }
     if (eventType === "pull_request") {
         const { pull_request } = github.context.payload;
         await (0, createPullRequestEvent_1.createPullRequestEvent)(notion, notionDatabase, token, pull_request);
+    }
+    if (eventType === "release") {
+        // TODO: move to another file
+        const octokit = github.getOctokit(token);
+        const owner = github.context.repo.owner;
+        const release = github.context.payload.release;
+        const repo = github.context.repo.repo;
+        const releaseTag = release.tag_name;
+        const releaseName = release.name;
+        console.log("New release created:", releaseTag, releaseName);
+        const { data: pullRequest } = await octokit.rest.pulls.list({
+            owner,
+            repo,
+            state: "closed",
+            base: releaseTag,
+        });
+        console.log("PULL REQUEST", JSON.stringify(pullRequest, null, 2));
+        // TODO: by each pull request, find the issue and update
+        // the version property with the release tag
     }
 };
 exports.main = main;
